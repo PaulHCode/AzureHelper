@@ -33,7 +33,7 @@ Copyright = '(c) Paul Harrison. All rights reserved.'
 Description = 'This module provides cmdlets to help in daily work, find cost savings, and report on Azure Policy compliance'
 
 # Minimum version of the PowerShell engine required by this module
-# PowerShellVersion = ''
+PowerShellVersion = '5.1'
 
 # Name of the PowerShell host required by this module
 # PowerShellHostName = ''
@@ -51,7 +51,7 @@ Description = 'This module provides cmdlets to help in daily work, find cost sav
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-# RequiredModules = @()
+RequiredModules = @('Az.Compute', 'Az.Resources', 'Az.Network','Az.Billing','Az.Accounts','Az.Sql')
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()

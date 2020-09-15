@@ -49,6 +49,7 @@ Function Get-AHSecurityReport {
         $ReportPath = ".\"
     )
     begin {
+        Test-AHEnvironment
         #Validate there are PolicyIDs defined to run against
         If ($Null -eq $Script:PolicyDefinitionIDs) {
             throw { "No PolicyDefinitionIDs defined.  Use Add-AHPolicyToReport to add additional policies." }

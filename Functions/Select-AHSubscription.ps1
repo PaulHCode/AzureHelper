@@ -1,5 +1,5 @@
 Function Select-AHSubscription {
-            <#
+    <#
 .SYNOPSIS
     Select a subscription in  GUI from the ones you have access to then Set-AZContext to it.
 .DESCRIPTION
@@ -14,6 +14,7 @@ Function Select-AHSubscription {
     Author:  Paul Harrison
 .LINK
 #>
+    Test-AHEnvironment
     $sub = $Null
     While ($Null -eq $sub -or $sub -is [array]) {
         $sub = (Get-AzSubscription | Select-Object Name, Id | Out-GridView -PassThru -Title "Select the subscription to use")

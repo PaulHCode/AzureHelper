@@ -29,7 +29,7 @@ Function New-AHRoute {
     param(
         $MaxRoutesPerRouteTable = 400
     )
-
+    Test-AHEnvironment
     $location = (Get-AzLocation | Out-GridView -PassThru -Title "Select the location").location
     $serviceTagRaw = (Get-AzNetworkServiceTag -Location $location).Values | Out-GridView -PassThru -Title "Select the Network Service Tag"
     $RouteTable = Get-AzRouteTable | Out-GridView -PassThru -Title "Select the Route Table to modify"
@@ -39,7 +39,7 @@ Function New-AHRoute {
     Else {
         ForEach ($AddressPrefix in $($serviceTagRaw.properties.addressprefixes)) {
             $RouteName = $($serviceTagRaw.name) + $($AddressPrefix.split('/')[0])
-            (Get-AzRouteTable -ResourceGroupName $($RouteTable.ResourceGroupName) -Name $($RouteTable.Name) | Add-AzRouteConfig -Name $RouteName -AddressPrefix $AddressPrefix -NextHopType Internet | Set-AzRouteTable).Routes | Where-Object { $_.Name -eq $RouteName } #| FT Name, ProvisioningState, AddressPrefix, NextHopType, NextHotIPAddress
+            (Get-AzRouteTable -ResourceGroupName $($RouteTable.ResourceGroupName) -Name $($RouteTable.Name) | Add-AzRouteConfig -Name $RouteName -AddressPrefix $AddressPrefix -NextHopType Internet | Set-AzRouteTable).Routes | Where-Object { $_.Name -eq $RouteName } 
         }
     }
 }

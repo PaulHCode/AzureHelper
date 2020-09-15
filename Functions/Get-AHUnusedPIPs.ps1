@@ -40,6 +40,7 @@ function Get-AHUnusedPIPs {
         $IncludeCost#>
     )
     begin {
+        Test-AHEnvironment
         $CurrentSubscription = (Get-AzContext).Subscription.Name
         $SelectSplat = @{ N = "Subscription"; E = { $CurrentSubscription }}, 'ResourceGroupName', 'Location', 'Name', 'Id', 'PublicIpAllocationMethod', 'PublicIpAddressVersion', 'IpAddress'
         <#If ($IncludeCost) {

@@ -40,6 +40,7 @@ function Get-AHNonHubWindowsServers {
             $Subscription
         )
         begin {
+            Test-AHEnvironment
             $MyScriptBlock = {
                 $thisSub = (Get-AzContext).Subscription.Name
                 Get-AzVm | 

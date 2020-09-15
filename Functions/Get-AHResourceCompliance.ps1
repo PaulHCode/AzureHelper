@@ -41,7 +41,7 @@ Function Get-AHResourceCompliance {
         $Compliance = 'NonCompliant'
     )
     begin {
-        Write-Host $PolicyDefinitionID
+        Test-AHEnvironment
 
         If ($Null -eq $PolicyDefinitionID) {
             $PolicyDefinitionID = (Get-AzPolicyDefinition | Select-Object * -ExpandProperty Properties | Out-GridView -PassThru -Title "Select the Policy to check for compliance.").ResourceId

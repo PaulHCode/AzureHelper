@@ -54,6 +54,7 @@ Function Get-AHSavingsReport {
         $IncludeCost
     )
     begin {
+        Test-AHEnvironment
         #validate ReportPath here
         If (!(Test-Path $ReportPath)) {
             Throw("Invalid Path")

@@ -43,6 +43,7 @@ function Get-AHDBAllocation {
         $IncludeCost
     )
     begin {
+        Test-AHEnvironment
         $CurrentSubscription = (Get-AzContext).Subscription.Name
         $SelectSplat = @{N = 'Subscription'; E = { $CurrentSubscription } }, 'ResourceGroupName', 'ServerName', 'DatabaseName', 'DatabaseId', 'CurrentServiceObjectiveName', 'Capacity', 'Family', 'SkuName', 'LicenseType', 'Location', 'ZoneRedundant', @{N = "MaxCPU"; E = { ((Get-AzMetric -WarningAction 0 -ResourceId $_.ResourceId -MetricName cpu_percent -TimeGrain 01:00:00 -StartTime ((Get-Date).AddDays(-14)) -EndTime (Get-Date) -AggregationType Maximum | Select-Object -ExpandProperty Data).maximum | Measure-Object -Maximum).Maximum } }
         If($IncludeCost){

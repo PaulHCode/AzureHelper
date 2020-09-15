@@ -38,6 +38,7 @@ function Get-AHExtraDiskGBPaidFor {
     )
 
     begin {
+        Test-AHEnvironment
         Function Get-ExtraGBPaidForHelper {
             param(
                 $disk

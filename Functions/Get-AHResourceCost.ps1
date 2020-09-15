@@ -11,7 +11,7 @@ Function Get-AHResourceCost {
         [switch]
         $ToThePenny
     )
-
+    Test-AHEnvironment
     $MyDate = Get-Date
     $Cost = ((Get-AzConsumptionUsageDetail -InstanceId $ResourceId -StartDate ($MyDate.AddDays(-30)) -EndDate $MyDate | Measure-Object -Property pretaxcost -sum).sum)   
 

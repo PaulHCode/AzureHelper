@@ -43,7 +43,7 @@ function Invoke-AzureCommand {
     )
 
     process {
-
+        Test-AHEnvironment
         if (-not $AllSubscriptions -and -not $Subscription) {
             return $ScriptBlock.Invoke($ArgumentList)
         }

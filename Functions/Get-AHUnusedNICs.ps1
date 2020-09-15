@@ -44,6 +44,7 @@ function Get-AHUnusedNICs {
         $IncludeCost
     )
     begin {
+        Test-AHEnvironment
         $CurrentSubscription = (Get-AzContext).Subscription.Name
         $SelectSplat = @{N = "Subscription"; E = { $CurrentSubscription } }, 'ResourceGroupName', 'VirtualMachine', 'MacAddress', 'NetworkSecurityGroup', 'PrivateEndpoint', 'Location', 'Id', 'Name'
         If ($IncludeCost) {

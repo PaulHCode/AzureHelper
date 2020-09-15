@@ -44,6 +44,7 @@ function Get-AHUnusedDisks {
         $IncludeCost
     )
     begin {
+        Test-AHEnvironment
         $CurrentSubscription = (Get-AzContext).Subscription.Name
         $SelectSplat = @{N = 'Subscription'; E = { $CurrentSubscription } }, 'ResourceGroupName', 'ManagedBy', 'DiskState', 'OsType', 'Location', 'DiskSizeGB', 'Id', 'Name'
         If($IncludeCost){
