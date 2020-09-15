@@ -37,14 +37,24 @@ function Get-AHDBAllocation {
         $AllSubscriptions,
     
         [Parameter(ValueFromPipeline = $true)]
-        $Subscription
+        $Subscription,
+
+        [switch]
+        $IncludeCost
     )
     begin {
+        $CurrentSubscription = (Get-AzContext).Subscription.Name
+        $SelectSplat = @{N = 'Subscription'; E = { $CurrentSubscription } }, 'ResourceGroupName', 'ServerName', 'DatabaseName', 'DatabaseId', 'CurrentServiceObjectiveName', 'Capacity', 'Family', 'SkuName', 'LicenseType', 'Location', 'ZoneRedundant', @{N = "MaxCPU"; E = { ((Get-AzMetric -WarningAction 0 -ResourceId $_.ResourceId -MetricName cpu_percent -TimeGrain 01:00:00 -StartTime ((Get-Date).AddDays(-14)) -EndTime (Get-Date) -AggregationType Maximum | Select-Object -ExpandProperty Data).maximum | Measure-Object -Maximum).Maximum } }
+        If($IncludeCost){
+            $SelectSplat += @{N='Last30DayCost';E={Get-AHResourceCost -ResourceId $_.ResourceId -ToThePenny}}
+        }
+
         $MyScriptBlock = {
-            Get-AzSqlServer | Get-AzSqlDatabase | `
-                Select-Object @{N = "Subscription"; E = { (Get-AzContext).Subscription.Name } }, ResourceGroupName, ServerName, DatabaseName, DatabaseId, CurrentServiceObjectiveName, Capacity, `
+            Get-AzSqlServer | Get-AzSqlDatabase | Select-Object -Property $SelectSplat  
+<#                Select-Object @{N = "Subscription"; E = { (Get-AzContext).Subscription.Name } }, ResourceGroupName, ServerName, DatabaseName, DatabaseId, CurrentServiceObjectiveName, Capacity, `
                 Family, SkuName, LicenseType, Location, ZoneRedundant, `
             @{N = "MaxCPU"; E = { ((Get-AzMetric -WarningAction 0 -ResourceId $_.ResourceId -MetricName cpu_percent -TimeGrain 01:00:00 -StartTime ((Get-Date).AddDays(-14)) -EndTime (Get-Date) -AggregationType Maximum | Select-Object -ExpandProperty Data).maximum | Measure-Object -Maximum).Maximum } }
+            #>
         }
     }
     process {
