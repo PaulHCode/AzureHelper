@@ -30,7 +30,7 @@ CompanyName = 'Microsoft'
 Copyright = '(c) Paul Harrison. All rights reserved.'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'This module provides cmdlets to help in daily work, find cost savings, and report on Azure Policy compliance'
 
 # Minimum version of the PowerShell engine required by this module
 # PowerShellVersion = ''
