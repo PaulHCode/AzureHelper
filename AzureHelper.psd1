@@ -27,7 +27,7 @@ Author = 'Paul Harrison'
 CompanyName = 'Microsoft'
 
 # Copyright statement for this module
-Copyright = '(c) pauharri. All rights reserved.'
+Copyright = '(c) Paul Harrison. All rights reserved.'
 
 # Description of the functionality provided by this module
 # Description = ''
