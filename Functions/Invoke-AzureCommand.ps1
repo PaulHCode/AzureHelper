@@ -11,7 +11,9 @@ function Invoke-AzureCommand {
 .PARAMETER ArgumentList
     Specifies an array of arguments to pass to the ScriptBlock 
 .PARAMETER AllSubscriptions
-    Run this command against all subscriptions.
+    Run this command against all subscriptions except disabled subscriptions.
+.PARAMETER IncludeDisabledSubscriptions
+    Include disabled subscriptions when selecting -AllSubscriptions
 .PARAMETER Subscription
     Specifies the subscription to run against. The default is the current subscription.
 .EXAMPLE
@@ -38,6 +40,9 @@ function Invoke-AzureCommand {
         [switch]
         $AllSubscriptions,
 
+        [switch]
+        $IncludeDisabledSubscriptions,
+
         [array]
         $ArgumentList
     )
@@ -52,6 +57,9 @@ function Invoke-AzureCommand {
     
         if ($Subscription) { $subs = $Subscription }
         else { $subs = Get-AzSubscription }
+        If (!($IncludeDisabledSubscriptions)) {
+            $subs = $subs | Where-Object { 'Enabled' -eq $_.State }
+        }
     
         $subCount = 0
         foreach ($sub in $subs) {
