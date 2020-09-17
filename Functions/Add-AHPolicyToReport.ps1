@@ -46,6 +46,12 @@ Function Add-AHPolicyToReport {
         (Get-AzPolicyDefinition -Custom).ResourceId | ForEach-Object { $Script:PolicyDefinitionIDs += $_ }
     }
     ElseIf ($GUI) {
+        If ('System.Management.Automation.ServerRemoteDebugger' -eq [System.Management.Automation.Runspaces.Runspace]::DefaultRunspace.Debugger.GetType().FullName) {
+            throw "The GUI switch can only be used on a local host and cannot be used from a remote session."
+        }
+        elseif ((get-item env:/).Name -contains 'AZURE_HTTP_USER_AGENT') {
+            throw "The GUI switch can only be used on a local host and cannot be used from Azure Cloud Shell."
+        }
         ((Get-AzPolicyDefinition | Select-Object @{N = 'DisplayName'; E = { $_.Properties.DisplayName } }, @{N = 'PolicyType'; E = { $_.Properties.PolicyType } }, @{N = 'Description'; E = { $_.Properties.Description } }, @{N = 'ResourceId'; E = { $_.ResourceId } } | Out-GridView -PassThru -Title "Select the Policies to add to the report").ResourceId) | ForEach-Object { $Script:PolicyDefinitionIDs += $_ }
     }
     ElseIf ($Null -eq $PolicyDefinitionID -or (Get-AzPolicyDefinition -Id $PolicyDefinitionID) -is [array]) { 
