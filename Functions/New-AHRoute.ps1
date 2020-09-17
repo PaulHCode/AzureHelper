@@ -30,6 +30,14 @@ Function New-AHRoute {
         $MaxRoutesPerRouteTable = 400
     )
     Test-AHEnvironment
+
+    If ('System.Management.Automation.ServerRemoteDebugger' -eq [System.Management.Automation.Runspaces.Runspace]::DefaultRunspace.Debugger.GetType().FullName) {
+        throw "This cmdlet can only be used on a local host and cannot be used from a remote session."
+    }
+    elseif ((get-item env:/).Name -contains 'AZURE_HTTP_USER_AGENT') {
+        throw "This cmdlet can only be used on a local host and cannot be used from Azure Cloud Shell."
+    }
+
     $location = (Get-AzLocation | Out-GridView -PassThru -Title "Select the location").location
     $serviceTagRaw = (Get-AzNetworkServiceTag -Location $location).Values | Out-GridView -PassThru -Title "Select the Network Service Tag"
     $RouteTable = Get-AzRouteTable | Out-GridView -PassThru -Title "Select the Route Table to modify"
