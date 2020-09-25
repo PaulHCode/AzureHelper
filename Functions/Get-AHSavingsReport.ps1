@@ -69,6 +69,8 @@ Function Get-AHSavingsReport {
             param($CSV, $HTML)
             $ReportName = (Get-AzContext).name.split('(')[0].replace(' ', '')
             
+            Write-Progress -Activity "Checking for savings" -Status (Get-AzContext).Subscription.Name -PercentComplete (100 * $subCount / $($subs.count))
+
             $UnusedDisks = Get-AHUnusedDisks -IncludeCost:$IncludeCost
             $UnusedNICs = Get-AHUnusedNICs -IncludeCost:$IncludeCost
             $UnusedPIPs = Get-AHUnusedPIPs #-IncludeCost:$IncludeCost
