@@ -45,13 +45,15 @@ function Get-AHUnusedNICs {
     )
     begin {
         Test-AHEnvironment
-        $CurrentSubscription = (Get-AzContext).Subscription.Name
-        $SelectSplat = @{N = "Subscription"; E = { $CurrentSubscription } }, 'ResourceGroupName', 'VirtualMachine', 'MacAddress', 'NetworkSecurityGroup', 'PrivateEndpoint', 'Location', 'Id', 'Name'
-        If ($IncludeCost) {
-            $SelectSplat += @{N = 'Last30DayCost'; E = { Get-AHResourceCost -ResourceId $_.Id -ToThePenny } }
-        }
+
 
         $MyScriptBlock = {
+            $CurrentSubscription = (Get-AzContext).Subscription.Name
+            $SelectSplat = @{N = "Subscription"; E = { $CurrentSubscription } }, 'ResourceGroupName', 'VirtualMachine', 'MacAddress', 'NetworkSecurityGroup', 'PrivateEndpoint', 'Location', 'Id', 'Name'
+            If ($IncludeCost) {
+                $SelectSplat += @{N = 'Last30DayCost'; E = { Get-AHResourceCost -ResourceId $_.Id -ToThePenny } }
+            }
+
             Get-AzNetworkInterface | Where-Object {
                 $null -eq $_.ManagedBy
             } | Select-Object -Property $SelectSplat

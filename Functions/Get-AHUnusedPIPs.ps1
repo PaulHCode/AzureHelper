@@ -41,13 +41,14 @@ function Get-AHUnusedPIPs {
     )
     begin {
         Test-AHEnvironment
-        $CurrentSubscription = (Get-AzContext).Subscription.Name
-        $SelectSplat = @{ N = "Subscription"; E = { $CurrentSubscription }}, 'ResourceGroupName', 'Location', 'Name', 'Id', 'PublicIpAllocationMethod', 'PublicIpAddressVersion', 'IpAddress'
+
         <#If ($IncludeCost) {
             $SelectSplat += @{N = 'Last30DayCost'; E = { Get-AHResourceCost -ResourceId $_.Id -ToThePenny } }
         }#>
 
         $MyScriptBlock = {
+            $CurrentSubscription = (Get-AzContext).Subscription.Name
+            $SelectSplat = @{ N = "Subscription"; E = { $CurrentSubscription }}, 'ResourceGroupName', 'Location', 'Name', 'Id', 'PublicIpAllocationMethod', 'PublicIpAddressVersion', 'IpAddress'
             Get-AzPublicIpAddress | Where-Object {
                 $null -eq $_.IpConfiguration.Id
             } | Select-Object -property $SelectSplat
