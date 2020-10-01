@@ -1,8 +1,5 @@
 Function Get-AHPolicyAssignment {
     param(
-        #        [string]
-        #        $ReportPath = ".\",
-
         [Switch]
         $AllSubscriptions,
     
@@ -13,18 +10,6 @@ Function Get-AHPolicyAssignment {
         $ManagementGroupOnly
     )
     begin {
-        <#
-        If (!(Test-Path $ReportPath)) {
-            Throw("Invalid Path")
-        }
-        Else {
-            $ReportPath = (Convert-Path $ReportPath) + '\' 
-        }
-        $ReportName = $ReportPath + "PolicyAssignmentReport.csv"
-    #>
-        #Get ones not in a sub first
-        #$Sub = $Null
-
         $ArgumentList = @()
         $ArgumentList += $ManagementGroupOnly
 

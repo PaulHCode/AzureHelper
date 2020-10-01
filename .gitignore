@@ -1,0 +1,10 @@
+# ignore unreleased code
+#Function/Get-AHPolicyAssignment.ps1
+
+# ignore crap
+crap.ps1
+crap.*
+
+# ignore the TestResults
+TestResults/*
+AssignedPolicyReport.csv
