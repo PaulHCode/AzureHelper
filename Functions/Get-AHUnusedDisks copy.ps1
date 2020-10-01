@@ -45,13 +45,15 @@ function Get-AHUnusedDisks {
     )
     begin {
         Test-AHEnvironment
-        $CurrentSubscription = (Get-AzContext).Subscription.Name
-        $SelectSplat = @{N = 'Subscription'; E = { $CurrentSubscription } }, 'ResourceGroupName', 'ManagedBy', 'DiskState', 'OsType', 'Location', 'DiskSizeGB', 'Id', 'Name'
-        If($IncludeCost){
-            $SelectSplat += @{N='Last30DayCost';E={Get-AHResourceCost -ResourceId $_.Id -ToThePenny}}
-        }
+
 
         $MyScriptBlock = {
+            $CurrentSubscription = (Get-AzContext).Subscription.Name
+            $SelectSplat = @{N = 'Subscription'; E = { $CurrentSubscription } }, 'ResourceGroupName', 'ManagedBy', 'DiskState', 'OsType', 'Location', 'DiskSizeGB', 'Id', 'Name'
+            If($IncludeCost){
+                $SelectSplat += @{N='Last30DayCost';E={Get-AHResourceCost -ResourceId $_.Id -ToThePenny}}
+            }
+
             Get-AzDisk | Where-Object {
                 $null -eq $_.ManagedBy
             } | Select-Object -Property $SelectSplat   
