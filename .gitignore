@@ -9,7 +9,6 @@ Functions/Get-AHBackedUpVMs.ps1
 crap.ps1
 crap.*
 
-
 # ignore the TestResults
 TestResults/*
 AssignedPolicyReport.csv
