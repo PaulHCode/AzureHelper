@@ -4,6 +4,8 @@ Functions/Get-AHVMBackupStatus.ps1
 Functions/Copy-AHToAzure.ps1
 Functions/Get-AHGUIInput.ps1
 Functions/Get-AHBackedUpVMs.ps1
+#Functions/Remove-AHVirtualMachine.ps1
+#Functions/Remove-AHVM.ps1
 
 # ignore crap
 crap.ps1
