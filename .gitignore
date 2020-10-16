@@ -1,9 +1,14 @@
 # ignore unreleased code
 #Function/Get-AHPolicyAssignment.ps1
+Functions/Get-AHVMBackupStatus.ps1
+Functions/Copy-AHToAzure.ps1
+Functions/Get-AHGUIInput.ps1
+Functions/Get-AHBackedUpVMs.ps1
 
 # ignore crap
 crap.ps1
 crap.*
+
 
 # ignore the TestResults
 TestResults/*

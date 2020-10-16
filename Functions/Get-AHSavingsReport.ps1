@@ -77,7 +77,11 @@ Function Get-AHSavingsReport {
             $DBAllocation = Get-AHDBAllocation -IncludeCost:$IncludeCost
             $ExtraDiskGBPaidFor = Get-AHExtraDiskGBPaidFor
             $AHNonHubWindowsServers = Get-AHNonHubWindowsServers
-            
+
+            $MyScriptBlock2 = { (get-azvm -Status | Select-Object Name, PowerState, @{N = 'Size'; E = { $_.HardwareProfile.Size } }, ResourceGroupName, @{N = 'Subscription'; E = { (Get-AzContext).Subscription.Name } }) }
+            $VMStatus = Invoke-AzureCommand -ScriptBlock $MyScriptBlock2 #-AllSubscriptions
+            #$VMStatus | Where-Object { $_.PowerState -eq 'VM deallocated' } | Export-Csv DeallocatedVMs.csv
+
             If ($CSV) {
                 $UnusedDisks  | Export-Csv $($ReportPath + $ReportName + '-Savings-UnusedDisks.csv') -NoTypeInformation
                 $UnusedNICs   | Export-Csv $($ReportPath + $ReportName + '-Savings-UnusedNICs.csv') -NoTypeInformation
@@ -85,6 +89,7 @@ Function Get-AHSavingsReport {
                 $DBAllocation | Export-Csv $($ReportPath + $ReportName + '-Savings-DBAllocation.csv') -NoTypeInformation
                 $ExtraDiskGBPaidFor | Export-Csv $($ReportPath + $ReportName + '-Savings-ExtraDiskGBPaidFor.csv') -NoTypeInformation
                 $AHNonHubWindowsServers | Export-Csv  $($ReportPath + $ReportName + '-Savings-NonAHUBWindowsServers.csv') -NoTypeInformation
+                $VMStatus | Where-Object { $_.PowerState -eq 'VM deallocated' } | Export-Csv  $($ReportPath + $ReportName + '-Savings-DeallocatedVMs.csv') -NoTypeInformation
             }
             If ($HTML) {
                 "<h1>" + (Get-Date) + "</h1>" | Out-File $($ReportPath + $ReportName + '-Savings.html') -Append
@@ -100,8 +105,10 @@ Function Get-AHSavingsReport {
                 $ExtraDiskGBPaidFor | ConvertTo-Html | Out-File $($ReportPath + $ReportName + '-Savings.html') -Append
                 "<h1>Non hybrid benefit Windows Servers</h1>" | Out-File $($ReportPath + $ReportName + '-Savings.html') -Append
                 $AHNonHubWindowsServers | ConvertTo-Html | Out-File $($ReportPath + $ReportName + '-Savings.html') -Append
+                
+                "<h1>Deallocated VMs</h1>" | Out-File $($ReportPath + $ReportName + '-Savings.html') -Append
+                $VMStatus | Where-Object { $_.PowerState -eq 'VM deallocated' } | ConvertTo-Html | Out-File $($ReportPath + $ReportName + '-Savings.html') -Append
             }
- 
         }
     }
     process {

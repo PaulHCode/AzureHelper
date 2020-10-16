@@ -22,7 +22,11 @@ function Invoke-AzureCommand {
      $DiskScriptBlock = {Get-AzDisk | Where{$_.DiskSizeGB -gt 512}}
     Invoke-AzureCommand -AllSubscriptions -ScriptBlock $DiskScriptBlock | FT ResourceGroupName, Name, DiskSizeGB
     This example finds every disk larger than 512 GB in every subscription
-.INPUTS
+.Example
+    $MyScriptBlock = {get-azvm -Status | Where{$_.PowerState -eq 'VM deallocated'} | Select Name, ResourceGroupName, @{N='Subscription';E={(Get-AzContext).Subscription.Name}}}
+    Invoke-AzureCommand -ScriptBlock $MyScriptBlock -AllSubscriptions
+    This example lists every deallocated VM in every subscription.
+    .INPUTS
     ScriptBlock
 .OUTPUTS
     [array]
