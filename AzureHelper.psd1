@@ -12,7 +12,7 @@
     RootModule        = '.\AzureHelper.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.0.6'
+    ModuleVersion     = '1.0.7'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -22,9 +22,6 @@
 
     # Author of this module
     Author            = 'Paul Harrison'
-
-    # Company or vendor of this module
-    CompanyName       = 'Microsoft'
 
     # Copyright statement for this module
     Copyright         = '(c) Paul Harrison. All rights reserved.'
