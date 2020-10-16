@@ -38,16 +38,17 @@ Function Get-AHNonCompliantResources {
     begin {
         Test-AHEnvironment
         If ($Null -eq $PolicyDefinitionID) {
-#            Write-Host "is null"
+            #            Write-Host "PolicyDefinitionID is null"
             $PolicyDefinitionID = (Get-AzPolicyDefinition | Select-Object * -ExpandProperty Properties | Out-GridView -PassThru -Title "Select the Policy to check for compliance.").ResourceId
         }
-        ElseIf ((Get-AzPolicyDefinition -Id $PolicyDefinitionID) -is [array]) { #If a PolicyDefinitionID is passed at the CLI and is malformed then this will return an array and re-prompt the user for a correct value
-#            write-host "is array"
+        ElseIf ((Get-AzPolicyDefinition -Id $PolicyDefinitionID) -is [array]) {
+            #If a PolicyDefinitionID is passed at the CLI and is malformed then this will return an array and re-prompt the user for a correct value
+            #            write-host "is array"
             $PolicyDefinitionID = @()
         }
         While ($PolicyDefinitionID -is [array]) {
-#            Write-Host "is array again"
-#            Write-Warning "Only one Policy may be selected at a time."
+            #            Write-Host "is array again"
+            #            Write-Warning "Only one Policy may be selected at a time."
             $PolicyDefinitionID = (Get-AzPolicyDefinition | Select-Object * -ExpandProperty Properties | Out-GridView -PassThru  -Title "Select the Policy to check for compliance.").ResourceId
         }
         $MyScriptBlock = {
