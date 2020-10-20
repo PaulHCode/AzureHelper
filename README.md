@@ -11,7 +11,7 @@
 - New-AHRoute - Add UDR for access to Azure Endpoints
 - Get-AHBackedUpVMs - Gets all backed up VMs and their backup status
 - Get-AHVMBackupStatus - Gets all VMs and their backup status
-- Remove-AHVMs - removes a VM and associcated resources like NIC, disks, etc.
+- Remove-AHVM - removes a VM and associcated resources like NIC, disks, etc.
 - Resize-AHVM - resizes a VM
 - Get-UnusedDisks - Gets all unused disks
 - Get-UnusedNICs - Gets all unused Network cards
