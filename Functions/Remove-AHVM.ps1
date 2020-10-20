@@ -21,10 +21,13 @@ function Remove-AHVM {
 	.PARAMETER ResourceGroupName
 		The name of the resource group the Azure VM is a part of.
 	
-	.PARAMETER Wait
-		If you would rather wait for the Azure VM to be removed before returning control to the console, use this switch parameter.
-		If not, it will create a job and return a PSJob back.
-	#>
+    .PARAMETER AsJob
+        If you would rather have a job created to remove the VM in the background, use this switch parameter and specify credentials
+        with the Credential switch.
+
+    .PARAMETER Credential
+        Credentials to create the job if using -AsJob
+    #>
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
     param
     (
@@ -42,7 +45,7 @@ function Remove-AHVM {
 
         [Parameter()]
         [ValidateNotNullOrEmpty()]
-        [switch]$Wait
+        [switch]$AsJob
 		
     )
 
@@ -73,7 +76,7 @@ function Remove-AHVM {
                 $nic = Get-AzNetworkInterface -ResourceGroupName $vm.ResourceGroupName -Name $nicUri.Split('/')[-1]
                 Remove-AzNetworkInterface -Name $nic.Name -ResourceGroupName $vm.ResourceGroupName -Force
                 foreach ($ipConfig in $nic.IpConfigurations) {
-                    if ($ipConfig.PublicIpAddress -ne $null) {
+                    if ($Null -ne $ipConfig.PublicIpAddress) {
                         Write-Verbose -Message 'Removing the Public IP Address...'
                         Remove-AzPublicIpAddress -ResourceGroupName $vm.ResourceGroupName -Name $ipConfig.PublicIpAddress.Id.Split('/')[-1] -Force
                     } 
@@ -126,7 +129,7 @@ function Remove-AHVM {
 
         }
 			
-        if ($Wait.IsPresent) {
+        if (!$AsJob) {
             & $scriptBlock -VMName $VMName -ResourceGroupName $ResourceGroupName
         }
         else {
