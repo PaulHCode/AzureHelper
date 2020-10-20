@@ -1,4 +1,33 @@
 Function Get-AHPolicyAssignment {
+    <#
+    .SYNOPSIS
+        Gets a list of all Azure Policy assignments 
+    
+    .DESCRIPTION
+        Gets a list of all Azure Policy assignments 
+    
+    .PARAMETER AllSubscriptions
+        Run this command against all subscriptions.
+    
+    .PARAMETER Subscription
+        Specifies the subscription to run against. The default is the current subscription.
+
+    .PARAMETER ManagementGroupOnly
+        Only finds policies applied at the management group level
+    
+    .EXAMPLE
+    
+    .EXAMPLE
+    
+    .INPUTS
+        String
+    
+    .OUTPUTS
+    
+    .NOTES
+        Author:  Paul Harrison
+    #>
+    [CmdletBinding()]
     param(
         [Switch]
         $AllSubscriptions,
