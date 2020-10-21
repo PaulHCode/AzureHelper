@@ -34,10 +34,12 @@ Function Get-AHVMBackupStatus {
             catch { throw }
             $BackedUpVMs = Get-AHBackedUpVMs -AllSubscriptions:$AllSubscriptions -Subscription:$Subscription
             Get-AzVm | Where-Object { $_.id -notin $BackedUpVMs.Id } | ForEach-Object {
-                $VM = "" | Select-Object 'Subscription', 'VMName', 'ResourceGroupName', 'VaultName', 'LastBackupStatus', 'LastBackupTime', 'Id'
+                $VM = "" | Select-Object 'Subscription', 'VMName', 'VMResourceGroupName', 'VaultName', 'VaultResourceGroupName', 'VMStillExists', 'LastBackupStatus', 'LastBackupTime', 'Id'
                 $VM.Subscription = $Sub
                 $VM.VMName = $_.Name
-                $VM.ResourceGroupName = $_.ResourceGroupName
+                $VM.VMResourceGroupName = $_.ResourceGroupName
+                $VM.VMStillExists = $true
+                $VM.VaultResourceGroupName = $Null
                 $VM.VaultName = $Null
                 $VM.LastBackupStatus = $Null
                 $VM.LastBackupTime = $Null

@@ -30,7 +30,7 @@ Function Get-AHBackedUpVMs {
     )
     begin {
         $MyScriptBlock = {
-            $fgColor = [console]::ForegroundColor
+            #$fgColor = [console]::ForegroundColor
             try { az account set --subscription ((Get-AzContext).Subscription.Id) }
             catch { throw }
             $sub = ((Get-AzContext).Subscription.Name)
@@ -38,18 +38,20 @@ Function Get-AHBackedUpVMs {
             ForEach ($Vault in (Get-AzRecoveryServicesVault)) {
                 $VMs = az backup item list --resource-group $($Vault.ResourceGroupName) --vault-name $($Vault.Name) | ConvertFrom-Json
                 ForEach ($item in ($VMs | Where-Object { ($_.Name -split (';'))[0] -eq 'VM' })) {
-                    $VM = "" | Select-Object 'Subscription', 'VMName', 'ResourceGroupName', 'VaultName', 'LastBackupStatus', 'LastBackupTime', 'Id'
-                    $VM.Id = ($item.Id -split (';'))[0]
+                    $VM = "" | Select-Object 'Subscription', 'VMName', 'VMResourceGroupName', 'VaultName', 'VaultResourceGroupName', 'VMStillExists', 'LastBackupStatus', 'LastBackupTime', 'Id'
+                    $VM.Id = $item.properties.virtualMachineId 
                     $VM.Subscription = $sub
-                    $VM.VMName = $item.properties.FriendlyName
-                    $VM.ResourceGroupName = $item.ResourceGroup
+                    $VM.VMName = ($item.properties.sourceResourceId -split ('/'))[8]  
+                    $VM.VMResourceGroupName = ($item.properties.sourceResourceId -split ('/'))[4] 
+                    $VM.VMStillExists = If (Get-AzVM -ResourceGroupName $vm.VMResourceGroupName -Name $VM.VMName) { $true }else { $false }
+                    $VM.VaultResourceGroupName = $item.ResourceGroup
                     $VM.VaultName = $Vault.Name
                     $VM.LastBackupStatus = $item.properties.LastBackupStatus
                     $VM.LastBackupTime = $item.properties.LastBackupTime
                     $VMList += $VM
                 }
             }
-            [console]::ForegroundColor = $fgColor
+            #[console]::ForegroundColor = $fgColor
             $VMList
         }
     }
