@@ -1,0 +1,15 @@
+[
+    {
+        "Name": "DoD 800-53R4",
+        "Control": [
+            {
+                "Name": "AC-2",
+                "Policy": [
+                    {
+                        "Name": "Audit diagnostic setting"
+                    }
+                ]
+            }
+        ]
+    }
+]

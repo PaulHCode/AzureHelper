@@ -1,0 +1,649 @@
+[
+    {
+        "Name": "DoD 800-53R4",
+        "Control": [
+            {
+                "Name": "Test1",
+                "Policy": [
+                    {
+                        "Name": "Audit diagnostic setting"
+                    }
+                ]
+            },
+            {
+                "Name": "AC-2",
+                "Policy": [
+                    {
+                        "Name": "Deprecated accounts should be removed from your subscription"
+                    },
+                    {
+                        "Name": "Deprecated accounts with owner permissions should be removed from your subscription"
+                    },
+                    {
+                        "Name": "External accounts with owner permissions should be removed from your subscription"
+                    },
+                    {
+                        "Name": "External accounts with read permissions should be removed from your subscription"
+                    },
+                    {
+                        "Name": "External accounts with write permissions should be removed from your subscription"
+                    }
+                ]
+            },
+            {
+                "Name": "AC-2(7)",
+                "Policy": [
+                    {
+                        "Name": "An Azure Active Directory administrator should be provisioned for SQL servers"
+                    },
+                    {
+                        "Name": "Audit usage of custom RBAC rules"
+                    },
+                    {
+                        "Name": "Service Fabric clusters should only use Azure Active Directory for client authentication"
+                    }
+                ]
+            },
+            {
+                "Name": "AC-2(12)",
+                "Policy": [
+                    {
+                        "Name": "Management ports of virtual machines should be protected with just-in-time network access control"
+                    }
+                ]
+            },
+            {
+                "Name": "AC-5",
+                "Policy": [
+                    {
+                        "Name": "A maximum of 3 owners should be designated for your subscription"
+                    },
+                    {
+                        "Name": "Show audit results from Windows VMs in which the Administrators group contains any of the specified members"
+                    },
+                    {
+                        "Name": "Show audit results from Windows VMs in which the Administrators group does not contain all of the specified members"
+                    },
+                    {
+                        "Name": "Deploy prerequisites to audit Windows VMs in which the Administrators group contains any of the specified members"
+                    },
+                    {
+                        "Name": "Deploy prerequisites to audit Windows VMs in which the Administrators group does not contain all of the specified members"
+                    },
+                    {
+                        "Name": "There should be more than one owner assigned to your subscription"
+                    }
+                ]
+            },
+            {
+                "Name": "AC-6(7)",
+                "Policy": [
+                    {
+                        "Name": "A maximum of 3 owners should be designated for your subscription"
+                    },
+                    {
+                        "Name": "Show audit results from Windows VMs in which the Administrators group contains any of the specified members"
+                    },
+                    {
+                        "Name": "Show audit results from Windows VMs in which the Administrators group does not contain all of the specified members"
+                    },
+                    {
+                        "Name": "Deploy prerequisites to audit Windows VMs in which the Administrators group contains any of the specified members"
+                    },
+                    {
+                        "Name": "Deploy prerequisites to audit Windows VMs in which the Administrators group does not contain all of the specified members"
+                    },
+                    {
+                        "Name": "There should be more than one owner assigned to your subscription"
+                    }
+                ]
+            },
+            {
+                "Name": "AC-17(1)",
+                "Policy": [
+                    {
+                        "Name": "Show audit results from Linux VMs that allow remote connections from accounts without passwords"
+                    },
+                    {
+                        "Name": "Deploy prerequisites to audit Linux VMs that allow remote connections from accounts without passwords"
+                    },
+                    {
+                        "Name": "Storage accounts should restrict network access"
+                    },
+                    {
+                        "Name": "Remote debugging should be turned off for API Apps"
+                    },
+                    {
+                        "Name": "Remote debugging should be turned off for Function Apps"
+                    },
+                    {
+                        "Name": "Remote debugging should be turned off for Web Applications"
+                    }
+                ]
+            },
+            {
+                "Name": "AC-23",
+                "Policy": [
+                    {
+                        "Name": "Advanced data security should be enabled on your SQL servers"
+                    },
+                    {
+                        "Name": "Advanced data security should be enabled on SQL Managed Instance"
+                    },
+                    {
+                        "Name": "Auditing on SQL server should be enabled"
+                    }
+                ]
+            },
+            {
+                "Name": "AU-3(2)",
+                "Policy": [
+                    {
+                        "Name": "[Preview]: Audit Log Analytics Agent Deployment - VM Image (OS) unlisted"
+                    },
+                    {
+                        "Name": "Audit Log Analytics agent deployment in virtual machine scale sets - VM Image (OS) unlisted"
+                    },
+                    {
+                        "Name": "Audit Log Analytics workspace for VM - Report Mismatch"
+                    },
+                    {
+                        "Name": "The Log Analytics agent should be installed on Virtual Machine Scale Sets"
+                    },
+                    {
+                        "Name": "The Log Analytics agent should be installed on virtual machines"
+                    }
+                ]
+            },
+            {
+                "Name": "AU-5",
+                "Policy": [
+                    {
+                        "Name": "Audit diagnostic setting"
+                    },
+                    {
+                        "Name": "Auditing on SQL server should be enabled"
+                    },
+                    {
+                        "Name": "Advanced data security should be enabled on SQL Managed Instance"
+                    },
+                    {
+                        "Name": "Advanced data security should be enabled on your SQL servers"
+                    }
+                ]
+            },
+            {
+                "Name": "AU-6(4)",
+                "Policy": [
+                    {
+                        "Name": "[Preview]: Audit Log Analytics Agent Deployment - VM Image (OS) unlisted"
+                    },
+                    {
+                        "Name": "Audit Log Analytics agent deployment in virtual machine scale sets - VM Image (OS) unlisted"
+                    },
+                    {
+                        "Name": "Audit Log Analytics workspace for VM - Report Mismatch"
+                    }
+                ]
+            },
+            {
+                "Name": "AU-6(5)",
+                "Policy": [
+                    {
+                        "Name": "Audit diagnostic setting"
+                    },
+                    {
+                        "Name": "Vulnerability assessment should be enabled on SQL Managed Instance"
+                    },
+                    {
+                        "Name": "Vulnerability assessment should be enabled on your SQL servers"
+                    },
+                    {
+                        "Name": "Vulnerabilities in security configuration on your machines should be remediated"
+                    },
+                    {
+                        "Name": "Vulnerabilities on your SQL databases should be remediated"
+                    },
+                    {
+                        "Name": "Vulnerabilities should be remediated by a Vulnerability Assessment solution"
+                    },
+                    {
+                        "Name": "Vulnerabilities in security configuration on your virtual machine scale sets should be remediated"
+                    },
+                    {
+                        "Name": "[Preview]: Audit Log Analytics Agent Deployment - VM Image (OS) unlisted"
+                    },
+                    {
+                        "Name": "Audit Log Analytics agent deployment in virtual machine scale sets - VM Image (OS) unlisted"
+                    }
+                ]
+            },
+            {
+                "Name": "AU-12",
+                "Policy": [
+                    {
+                        "Name": "[Preview]: Audit Log Analytics Agent Deployment - VM Image (OS) unlisted"
+                    },
+                    {
+                        "Name": "Audit Log Analytics agent deployment in virtual machine scale sets - VM Image (OS) unlisted"
+                    },
+                    {
+                        "Name": "Audit Log Analytics workspace for VM - Report Mismatch"
+                    },
+                    {
+                        "Name": "Audit diagnostic setting"
+                    },
+                    {
+                        "Name": "Auditing on SQL server should be enabled"
+                    },
+                    {
+                        "Name": "Advanced data security should be enabled on SQL Managed Instance"
+                    },
+                    {
+                        "Name": "Advanced data security should be enabled on your SQL servers"
+                    }
+                ]
+            },
+            {
+                "Name": "AU-12(01)",
+                "Policy": [
+                    {
+                        "Name": "Audit diagnostic setting"
+                    }
+                ]
+            },
+            {
+                "Name": "CM-7(2)",
+                "Policy": [
+                    {
+                        "Name": "Adaptive application controls for defining safe applications should be enabled on your machines"
+                    }
+                ]
+            },
+            {
+                "Name": "CM-7(5)",
+                "Policy": [
+                    {
+                        "Name": "Adaptive application controls for defining safe applications should be enabled on your machines"
+                    }
+                ]
+            },
+            {
+                "Name": "CM-11",
+                "Policy": [
+                    {
+                        "Name": "Adaptive application controls for defining safe applications should be enabled on your machines"
+                    }
+                ]
+            },
+            {
+                "Name": "CP-7",
+                "Policy": [
+                    {
+                        "Name": "Audit virtual machines without disaster recovery configured"
+                    }
+                ]
+            },
+            {
+                "Name": "CP-9(05)",
+                "Policy": [
+                    {
+                        "Name": "Geo-redundant storage should be enabled for Storage Accounts"
+                    },
+                    {
+                        "Name": "Geo-redundant backup should be enabled for Azure Database for PostgreSQL"
+                    },
+                    {
+                        "Name": "Geo-redundant backup should be enabled for Azure Database for MySQL"
+                    },
+                    {
+                        "Name": "Long-term geo-redundant backup should be enabled for Azure SQL Databases"
+                    }
+                ]
+            },
+            {
+                "Name": "IA-2(1)",
+                "Policy": [
+                    {
+                        "Name": "MFA should be enabled on accounts with owner permissions on your subscription"
+                    },
+                    {
+                        "Name": "MFA should be enabled accounts with write permissions on your subscription"
+                    }
+                ]
+            },
+            {
+                "Name": "IA-2(2)",
+                "Policy": [
+                    {
+                        "Name": "MFA should be enabled on accounts with read permissions on your subscription"
+                    }
+                ]
+            },
+            {
+                "Name": "IA-5",
+                "Policy": [
+                    {
+                        "Name": "Show audit results from Linux VMs that do not have the passwd file permissions set to 0644"
+                    },
+                    {
+                        "Name": "Show audit results from Linux VMs that have accounts without passwords"
+                    },
+                    {
+                        "Name": "Show audit results from Windows VMs that do not store passwords using reversible encryption"
+                    },
+                    {
+                        "Name": "Deploy prerequisites to audit Linux VMs that do not have the passwd file permissions set to 0644"
+                    },
+                    {
+                        "Name": "Deploy prerequisites to audit Linux VMs that have accounts without passwords"
+                    },
+                    {
+                        "Name": "Deploy prerequisites to audit Windows VMs that do not store passwords using reversible encryption"
+                    }
+                ]
+            },
+            {
+                "Name": "IA-5(1)",
+                "Policy": [
+                    {
+                        "Name": "Show audit results from Windows VMs that allow re-use of the previous 24 passwords"
+                    },
+                    {
+                        "Name": "Show audit results from Windows VMs that do not have a maximum password age of 70 days"
+                    },
+                    {
+                        "Name": "Show audit results from Windows VMs that do not have a minimum password age of 1 day"
+                    },
+                    {
+                        "Name": "Show audit results from Windows VMs that do not have the password complexity setting enabled"
+                    },
+                    {
+                        "Name": "Show audit results from Windows VMs that do not restrict the minimum password length to 14 characters"
+                    },
+                    {
+                        "Name": "Show audit results from Windows VMs that do not store passwords using reversible encryption"
+                    },
+                    {
+                        "Name": "Deploy prerequisites to audit Windows VMs that allow re-use of the previous 24 passwords"
+                    },
+                    {
+                        "Name": "Deploy prerequisites to audit Windows VMs that do not have a maximum password age of 70 days"
+                    },
+                    {
+                        "Name": "Deploy prerequisites to audit Windows VMs that do not have a minimum password age of 1 day"
+                    },
+                    {
+                        "Name": "Deploy prerequisites to audit Windows VMs that do not have the password complexity setting enabled"
+                    },
+                    {
+                        "Name": "Deploy prerequisites to audit Windows VMs that do not restrict the minimum password length to 14 characters"
+                    },
+                    {
+                        "Name": "Deploy prerequisites to audit Windows VMs that do not store passwords using reversible encryption"
+                    }
+                ]
+            },
+            {
+                "Name": "IA-6(2)",
+                "Policy": [
+                    {
+                        "Name": "Vulnerabilities in security configuration on your virtual machine scale sets should be remediated"
+                    },
+                    {
+                        "Name": "Vulnerabilities should be remediated by a Vulnerability Assessment solution"
+                    },
+                    {
+                        "Name": "Vulnerabilities in security configuration on your machines should be remediated"
+                    },
+                    {
+                        "Name": "Vulnerabilities in container security configurations should be remediated"
+                    },
+                    {
+                        "Name": "Vulnerabilities on your SQL databases should be remediated"
+                    }
+                ]
+            },
+            {
+                "Name": "RA-5",
+                "Policy": [
+                    {
+                        "Name": "Advanced data security should be enabled on SQL Managed Instance"
+                    },
+                    {
+                        "Name": "Advanced data security should be enabled on your SQL servers"
+                    },
+                    {
+                        "Name": "Vulnerabilities in security configuration on your virtual machine scale sets should be remediated"
+                    },
+                    {
+                        "Name": "Vulnerabilities in security configuration on your machines should be remediated"
+                    },
+                    {
+                        "Name": "Vulnerabilities on your SQL databases should be remediated"
+                    },
+                    {
+                        "Name": "Vulnerabilities should be remediated by a Vulnerability Assessment solution"
+                    }
+                ]
+            },
+            {
+                "Name": "SC-5",
+                "Policy": [
+                    {
+                        "Name": "Azure DDoS Protection Standard should be enabled"
+                    }
+                ]
+            },
+            {
+                "Name": "SC-7",
+                "Policy": [
+                    {
+                        "Name": "Access through Internet facing endpoint should be restricted"
+                    },
+                    {
+                        "Name": "Storage accounts should restrict network access"
+                    }
+                ]
+            },
+            {
+                "Name": "SC-7(3)",
+                "Policy": [
+                    {
+                        "Name": "Management ports of virtual machines should be protected with just-in-time network access control"
+                    }
+                ]
+            },
+            {
+                "Name": "SC-7(4)",
+                "Policy": [
+                    {
+                        "Name": "Just-In-Time network access control should be applied on virtual machines"
+                    }
+                ]
+            },
+            {
+                "Name": "SC-8(1)",
+                "Policy": [
+                    {
+                        "Name": "API App should only be accessible over HTTPS"
+                    },
+                    {
+                        "Name": "Show audit results from Windows web servers that are not using secure communication protocols"
+                    },
+                    {
+                        "Name": "Deploy prerequisites to audit Windows web servers that are not using secure communication protocols"
+                    },
+                    {
+                        "Name": "Function App should only be accessible over HTTPS"
+                    },
+                    {
+                        "Name": "Only secure connections to your Azure Cache for Redis should be enabled"
+                    },
+                    {
+                        "Name": "Secure transfer to storage accounts should be enabled"
+                    },
+                    {
+                        "Name": "Web Application should only be accessible over HTTPS"
+                    }
+                ]
+            },
+            {
+                "Name": "SC-28(1)",
+                "Policy": [
+                    {
+                        "Name": "Advanced data security should be enabled on SQL Managed Instance"
+                    },
+                    {
+                        "Name": "Advanced data security should be enabled on your SQL servers"
+                    },
+                    {
+                        "Name": "Disk encryption should be applied on virtual machines"
+                    },
+                    {
+                        "Name": "Transparent Data Encryption on SQL databases should be enabled"
+                    }
+                ]
+            },
+            {
+                "Name": "SI-2",
+                "Policy": [
+                    {
+                        "Name": "System updates on virtual machine scale sets should be installed"
+                    },
+                    {
+                        "Name": "System updates should be installed on your machines"
+                    },
+                    {
+                        "Name": "Vulnerabilities in security configuration on your virtual machine scale sets should be remediated"
+                    },
+                    {
+                        "Name": "Vulnerabilities in security configuration on your machines should be remediated"
+                    },
+                    {
+                        "Name": "Vulnerabilities on your SQL databases should be remediated"
+                    },
+                    {
+                        "Name": "Vulnerabilities should be remediated by a Vulnerability Assessment solution"
+                    }
+                ]
+            },
+            {
+                "Name": "SI-02(06)",
+                "Policy": [
+                    {
+                        "Name": "Ensure that 'HTTP Version' is the latest, if used to run the Api app"
+                    },
+                    {
+                        "Name": "Ensure that 'HTTP Version' is the latest, if used to run the Function app"
+                    },
+                    {
+                        "Name": "Ensure that 'HTTP Version' is the latest, if used to run the Web app"
+                    },
+                    {
+                        "Name": "Ensure that 'Java version' is the latest, if used as a part of the Api app"
+                    },
+                    {
+                        "Name": "Ensure that 'Java version' is the latest, if used as a part of the Function app"
+                    },
+                    {
+                        "Name": "Ensure that 'Java version' is the latest, if used as a part of the Web app"
+                    },
+                    {
+                        "Name": "Ensure that 'PHP version' is the latest, if used as a part of the Api app"
+                    },
+                    {
+                        "Name": "Ensure that 'PHP version' is the latest, if used as a part of the WEB app"
+                    },
+                    {
+                        "Name": "Ensure that 'Python version' is the latest, if used as a part of the Api app"
+                    },
+                    {
+                        "Name": "Ensure that 'Python version' is the latest, if used as a part of the Function app"
+                    },
+                    {
+                        "Name": "Ensure that 'Python version' is the latest, if used as a part of the Web app"
+                    },
+                    {
+                        "Name": "Latest TLS version should be used in your API App"
+                    },
+                    {
+                        "Name": "Latest TLS version should be used in your Function App"
+                    },
+                    {
+                        "Name": "Latest TLS version should be used in your Web App"
+                    },
+                    {
+                        "Name": "Kubernetes Services should be upgraded to a non-vulnerable Kubernetes version"
+                    }
+                ]
+            },
+            {
+                "Name": "SI-3",
+                "Policy": [
+                    {
+                        "Name": "Endpoint protection solution should be installed on virtual machine scale sets"
+                    },
+                    {
+                        "Name": "Monitor missing Endpoint Protection in Azure Security Center"
+                    },
+                    {
+                        "Name": "Microsoft IaaSAntimalware extension should be deployed on Windows servers"
+                    }
+                ]
+            },
+            {
+                "Name": "SI-3(1)",
+                "Policy": [
+                    {
+                        "Name": "Endpoint protection solution should be installed on virtual machine scale sets"
+                    },
+                    {
+                        "Name": "Monitor missing Endpoint Protection in Azure Security Center"
+                    }
+                ]
+            },
+            {
+                "Name": "SI-4",
+                "Policy": [
+                    {
+                        "Name": "[Preview]: Audit Log Analytics Agent Deployment - VM Image (OS) unlisted"
+                    },
+                    {
+                        "Name": "Audit Log Analytics agent deployment in virtual machine scale sets - VM Image (OS) unlisted"
+                    },
+                    {
+                        "Name": "Audit Log Analytics workspace for VM - Report Mismatch"
+                    },
+                    {
+                        "Name": "Advanced data security should be enabled on SQL Managed Instance"
+                    },
+                    {
+                        "Name": "Advanced data security should be enabled on your SQL servers"
+                    },
+                    {
+                        "Name": "Network Watcher should be enabled"
+                    }
+                ]
+            },
+            {
+                "Name": "SI-4(12)",
+                "Policy": [
+                    {
+                        "Name": "Email notification to subscription owner for high severity alerts should be enabled"
+                    },
+                    {
+                        "Name": "A security contact email address should be provided for your subscription"
+                    },
+                    {
+                        "Name": "A security contact phone number should be provided for your subscription"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "Name": "Fish",
+        "Control": []
+    }
+]
