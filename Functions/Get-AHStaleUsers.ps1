@@ -4,9 +4,49 @@
         https://blogs.technet.microsoft.com/undocumentedfeatures/2018/06/22/how-to-find-staleish-azure-b2b-guest-accounts/
         https://gallery.technet.microsoft.com/Report-on-Azure-AD-Stale-8e64c1c5/edit?newSession=True
     
+        #I tweaked it for my purposes
 #>
 
 Function Get-AHStaleUsers {
+    <#
+.SYNOPSIS
+    Gets a list of stale AAD users.
+
+.DESCRIPTION
+    Gets a list of AAD users older than ($MaAgeMultiFactor + $StaleAgeInDays) days old.
+    This command may not work properly in PS Core.  I recommend running it on 5.1 Desktop.
+
+.PARAMETER InstallRequiredModules
+    Installs the required modules if necessary.
+
+.PARAMETER MaxAgeMultiFactor
+    The MaxAgeMultiFactor for the environment.  Defaults to 180.
+
+.PARAMETER StaleAgeInDays
+    The minimum age of the accounts.  Defaults to 90.
+
+.EXAMPLE
+    $staleUsers = Get-AHStaleUsers -InstallRequiredModules
+
+.EXAMPLE
+    $staleUsers = Get-AHStaleUsers -InstallRequiredModules -StaleAgeInDays 90 -MaxAgeMultiFactor 90
+
+.EXAMPLE
+    $staleUsers = Get-AHStaleUsers -InstallRequiredModules -StaleAgeInDays 90 -MaxAgeMultiFactor 90
+    $staleUsers | Where{$_.IsEnabled} | sort -Property LastLogon | Format-Table
+
+.INPUTS
+    int
+
+.OUTPUTS
+    System.Management.Automation.PSCustomObject
+
+.REMARKS
+    This is a test
+
+.NOTES
+    Author:  Paul Harrison
+#>
     [CmdletBinding()]
     param (
         [Parameter()]
@@ -14,7 +54,7 @@ Function Get-AHStaleUsers {
         $InstallRequiredModules,
         [Parameter()]
         [int]
-        $MaxInactiveTime,
+        $MaxAgeMultiFactor,
         [Parameter()]
         [int]
         $StaleAgeInDays = 90   
@@ -28,13 +68,9 @@ Function Get-AHStaleUsers {
             $prp = New-Object System.Security.Principal.WindowsPrincipal($wid)
             $adm = [System.Security.Principal.WindowsBuiltInRole]::Administrator
             if ($prp.IsInRole($adm)) {
-                #			Write-Log -LogFile $Logfile -LogLevel SUCCESS -ConsoleOutput -Message "Elevated PowerShell session detected. Continuing."
             }
             else {
-                #			Write-Log -LogFile $Logfile -LogLevel ERROR -ConsoleOutput -Message "InstallRequiredModules must be run in an elevated PowerShell window. Please launch an elevated session and try again."
-                #			$ErrorCount++
                 Throw { "InstallRequiredModules must be run in an elevated PowerShell window." }
-                #            Break
             }
 		
             Install-Module AzureADPreview -Force
@@ -44,22 +80,16 @@ Function Get-AHStaleUsers {
             }
             Catch {
                 throw { "Unable to import module. Please verify that the module is installed and try again." }
-                #			Write-Log -LogFile $Logfile -LogLevel ERROR -Message "Unable to import module. Please verify that the module is installed and try again." -ConsoleOutput
-                #			Write-Log -LogFile $Logfile -LogLevel WARN -Message "Continuing using defaults for Azure AD Policy settings ('90 days token refresh')."
             }
         }
         Else {
             throw { "Unable to detect module and InstallRequiredModules switch not supplied. Please verify that the module has installed and try again." }
-            #		Write-Log -LogFile $Logfile -LogLevel ERROR -Message "Unable to detect module and InstallRequiredModules switch not supplied. Please verify that the module has installed and try again." -ConsoleOutput
-            #		Write-Log -LogFile $Logfile -LogLevel WARN -Message "Continuing using defaults for Azure AD Policy settings ('90 days token refresh')."
         }
     }
     Else {
         Import-Module AzureADPreview -Force	
     }
 
-    # VerifyMaxInactiveTime
-    #If ($MaxInactiveTime -lt 1) { throw { "MaxInactiveTime must be greater than 0." } }
 
     # Check for existing Azure AD Connection
     Try {
@@ -70,34 +100,37 @@ Function Get-AHStaleUsers {
         Connect-AzureAD -credential $cred
     }
 
-    #Should switch to MaxAgeMultiFactor since we're doing MFA
-    If (!($MaxInactiveTime)) {
-        $AzureADPolicy = Get-AzureADPolicy | Where-Object { $_.Type -eq "TokenLifetimePolicy" }
+    If (!($MaxAgeMultiFactor)) {
+        <#        $AzureADPolicy = Get-AzureADPolicy | Where-Object { $_.Type -eq "TokenLifetimePolicy" }
         If ($AzureADPolicy) {
             $PolicyData = $AzureADPolicy.Definition | ConvertFrom-Json
-            # Retrieve value for MaxInactiveTime
-            [int]$MaxInactiveTime = $PolicyData.TokenLifetimePolicy.MaxInactiveTime.Split(":")[0].Split(".")[0]
+            # Retrieve value for MaxAgeMultiFactor
+            [int]$MaxAgeMultiFactor = $PolicyData.TokenLifetimePolicy.MaxAgeMultiFactor.Split(":")[0].Split(".")[0]
 		
-            # Test MaxInactiveTime; if not exist, set to AAD default of 90 days, 
+            # Test MaxAgeMultiFactor; if not exist, set to AAD default of 90 days, 
             # per https://docs.microsoft.com/en-us/azure/active-directory/active-directory-configurable-token-lifetimes
 
         }
-        If (!$MaxInactiveTime) {
-            $MaxInactiveTime = "180" #changed to 180 instead of 90 since we do MFA on everyone
+        #>
+        If (!$MaxAgeMultiFactor) {
+            $MaxAgeMultiFactor = "180" #180 is the default as per the article above
         }
     }
 
-    #    Write-Host "MaxInactiveTime = $MaxInactiveTime"
+    #Write-Host "MaxAgeMultiFactor = $MaxAgeMultiFactor"
+    # VerifyMaxAgeMultiFactor
+    If ($MaxAgeMultiFactor -lt 1) { throw { "MaxAgeMultiFactor must be greater than 0." } }
+
+
 
     $Today = (Get-Date)
     $users = Get-AzureADUser -All $true
-    [int]$StaleAge = $MaxInactiveTime + $StaleAgeInDays
+    [int]$StaleAge = $MaxAgeMultiFactor + $StaleAgeInDays
 
     $StaleUsers = $users | ForEach-Object {
         $TimeStamp = $_.RefreshTokensValidFromDateTime
-        #	$TimeStampString = $TimeStamp.ToString()
         [int]$LogonAge = [math]::Round(($Today - $TimeStamp).TotalDays)
-        [int]$StaleAge = $MaxInactiveTime + $StaleAgeInDays
+        [int]$StaleAge = $MaxAgeMultiFactor + $StaleAgeInDays
         $User = $($_.UserPrincipalName)
         If ($LogonAge -ge $StaleAge) {
             [pscustomobject]@{
@@ -105,7 +138,7 @@ Function Get-AHStaleUsers {
                 DisplayName                  = $($_.DisplayName)
                 IsEnabled                    = $_.AccountEnabled
                 ObjectID                     = $_.ObjectID
-                IsStale                      = "True"
+                IsStale                      = $true
                 LastLogon                    = $TimeStamp
                 DaysSinceLastLogon           = $LogonAge
                 UserIsStaleAfterThisManyDays = $StaleAge
