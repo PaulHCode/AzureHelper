@@ -1,7 +1,31 @@
 #Get all policies and group them by resources impacted
 
 #$MyReport = @()
-function Get-PolicyByResource {
+function Get-AHPolicyByResource {
+    <#
+    .SYNOPSIS
+        Gets all resources that Azure Policies are applied to 
+    
+    .DESCRIPTION
+        Gets all resources Azure Policies are applied to
+    
+    .EXAMPLE
+        $myreport = Get-AHPolicyByResource
+        $myreport | group -Property type | select name,count
+        $myreport | where{$_.type -eq 'Microsoft.Compute/virtualMachines'} |ft Type, policyDisplayName, PolicySetDisplayName
+        
+        Get a list of all Azure Policies by resource then look at which resources are impacted.
+        Check which policies and policy sets are impacting virtual machines.
+    .EXAMPLE
+    
+    .INPUTS
+        String
+    
+    .OUTPUTS
+    
+    .NOTES
+        Author:  Paul Harrison
+    #>
     $Assignments = Get-AzPolicyAssignment
     $MyReport = ForEach ($Assignment in $Assignments) {
         If ($Assignment.Properties.PolicyDefinitionId.split('/') -contains 'policySetDefinitions') {
