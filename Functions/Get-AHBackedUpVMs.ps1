@@ -3,7 +3,7 @@ Function Get-AHBackedUpVMs {
 .SYNOPSIS
     Gets the backed up VMs and their status
 .DESCRIPTION
-    Gets the backed up VMs and their status
+    Gets the status of backed up VMs even if the VM no longer exists.
 .PARAMETER AllSubscriptions
     Run this command against all subscriptions.
 .PARAMETER Subscription
