@@ -17,7 +17,7 @@ Function Resize-AHVM {
 .PARAMETER Force
     Deallocates the VM to resize it if it is currently not deallocated
 .EXAMPLE
-    Remove-AHPolicyToReport -PolicyDefinitionID '/providers/Microsoft.Authorization/policyDefinitions/0015ea4d-51ff-4ce3-8d8c-f3f8f0179a56'
+    
 .INPUTS
     String
 .OUTPUTS

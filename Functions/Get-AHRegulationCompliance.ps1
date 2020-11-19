@@ -16,50 +16,94 @@ Function Get-AHRegulationCompliance {
         $RegulationFile = 'C:\GitHub\AzureHelper\Regulations.json',
 
         [switch]
-        $Summary
+        $Summary,
+
+        [validatescript( { $_ -and (($PSVersionTable.psversion.major -gt 7 -and $PSVersionTable.psversion.minor -gt 0) -or ($PSVersionTable.psversion.major -eq 7 -and $PSVersionTable.psversion.minor -eq 0 -and $PSVersionTable.psversion.Patch -ge 3)) })]
+        [switch]
+        $Parallel
     )
-    begin {
-        If (!(Test-Path $RegulationFile)) { throw 'Invalid Regulation File' }
+    #    begin {
+    If (!(Test-Path $RegulationFile)) { throw 'Invalid Regulation File' }
 
-        $Regulations = Get-Content $RegulationFile | ConvertFrom-Json
-        $RegToCheck = $Regulations | Where-Object { $_.Name -eq $Regulation }
-        If ($Null -eq $RegToCheck) { throw "$Regulation not found in $RegulationFile" }
-        $Total = @()
+    $Regulations = Get-Content $RegulationFile | ConvertFrom-Json
+    $RegToCheck = $Regulations | Where-Object { $_.Name -eq $Regulation }
+    If ($Null -eq $RegToCheck) { throw "$Regulation not found in $RegulationFile" }
+    $Total = @()
 
-        #        $MyScriptBlock = {
-        $Sub = (Get-AzContext).Subscription.Name
+    $Sub = (Get-AzContext).Subscription.Name
 
-        $controlCount = 0
-        $policyCount = 0
-        $PolicyDefinitions = Get-AzPolicyDefinition
+    $controlCount = 0
+    $policyCount = 0
+    $PolicyDefinitions = Get-AzPolicyDefinition
+    
+    #single threaded version    
+    If (!$Parallel) {
         ForEach ($Control in $RegToCheck.Control) {
             Write-Progress -Activity "Checking for $($RegToCheck.Name) compliance" -Status "Checking $($Control.Name)" -PercentComplete (100 * $controlCount / $($RegToCheck.Control.count))
             $policyCount = 0
-            ForEach ($Policy in $Control.Policy) {
+            $subTotal = ForEach ($Policy in $Control.Policy) {
                 Write-Progress -Activity "Checking: $($Policy.Name)" -PercentComplete (100 * $policyCount / $($Control.Policy.count)) -Id 1
                 $policyCount++
                 $PolicyDefinitionId = ($PolicyDefinitions | Where-Object { $_.Properties.DisplayName -eq $Policy.Name }).PolicyDefinitionId
                 $PolicyState = Get-AzPolicyState -Filter "PolicyDefinitionId eq '$PolicyDefinitionID'"
-                $item = "" | Select-Object Subscription, Regulation, Control, Policy, PolicyExists, NonCompliantCount, TotalObjectCount
-                $item.Subscription = $Sub
-                $item.Regulation = $Regulation
-                $item.Control = $Control.Name
-                $item.Policy = $Policy.Name
-                $item.PolicyExists = ($Null -ne $PolicyDefinitionId)
-                $item.NonCompliantCount = ($PolicyState | Where-Object { $_.ComplianceState -eq 'NonCompliant' }).count
-                $item.TotalObjectCount = ($PolicyState).count
-                $Total += $item
+                $item = New-Object PSCustomObject -Property @{
+                    Subscription      = $Sub
+                    Regulation        = $Regulation
+                    Control           = $Control.Name
+                    Policy            = $Policy.Name
+                    PolicyExists      = ($Null -ne $PolicyDefinitionId)
+                    NonCompliantCount = ($PolicyState | Where-Object { $_.ComplianceState -eq 'NonCompliant' }).count
+                    TotalObjectCount  = ($PolicyState).count
+                }
+
+                $item
             }
+            $Total += $subTotal
+
+
             $controlCount++
         }
-        If (!$Summary) {
-            $Total
-        }
-        Else {    
-            $Total | Group-Object -Property Control | Select-Object @{N = 'Subscription'; E = { $Sub } }, @{N = 'Regulation'; E = { $Regulation } }, @{N = 'Control'; E = { $_.Name } }, @{N = 'isCompliant'; E = { $_.count -eq 0 } }
+    }
+    Else {
+        #yay multithreading
+        $RegToCheck.Control | ForEach-Object -ThrottleLimit 64 -Parallel {
+            $Control = $_
+            #            Write-Progress -Activity "Checking for $($RegToCheck.Name) compliance" -Status "Checking $($Control.Name)" -PercentComplete (100 * $controlCount / $($using:RegToCheck.Control.count))
+            $policyCount = 0
+            ForEach ($Policy in $Control.Policy) {
+                #                Write-Progress -Activity "Checking: $($Policy.Name)" -PercentComplete (100 * $policyCount / $($Control.Policy.count)) -Id 1
+                $policyCount++
+                $PolicyDefinitionId = ($using:PolicyDefinitions | Where-Object { $_.Properties.DisplayName -eq $Policy.Name }).PolicyDefinitionId
+                $PolicyState = Get-AzPolicyState -Filter "PolicyDefinitionId eq '$PolicyDefinitionID'"
+
+
+                $item = New-Object PSCustomObject -Property @{
+                    Subscription      = $using:Sub
+                    Regulation        = $using:Regulation
+                    Control           = $Control.Name
+                    Policy            = $Policy.Name
+                    PolicyExists      = ($Null -ne $PolicyDefinitionId)
+                    NonCompliantCount = ($PolicyState | Where-Object { $_.ComplianceState -eq 'NonCompliant' }).count
+                    TotalObjectCount  = ($PolicyState).count
+                }
+                $item
+            }
+
+            $Total += $subTotal
+
+            $controlCount++
         }
     }
+
+
+    If (!$Summary) {
+        $Total
+    }
+    Else {    
+        $Total | Group-Object -Property Control | Select-Object @{N = 'Subscription'; E = { $Sub } }, @{N = 'Regulation'; E = { $Regulation } }, @{N = 'Control'; E = { $_.Name } }, @{N = 'isCompliant'; E = { $_.count -eq 0 } }
+    }
 }
+#}
 #process {
 #    if ($Subscription) { $Subscription | Invoke-AzureCommand -ScriptBlock $MyScriptBlock <#-ArgumentList $ArgumentList#> }
 #    else { Invoke-AzureCommand -ScriptBlock $MyScriptBlock -AllSubscriptions:$AllSubscriptions <#-ArgumentList $ArgumentList#> }

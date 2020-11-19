@@ -1,3 +1,8 @@
+
+
+
+
+
 #Get all policies and group them by resources impacted
 
 #$MyReport = @()
@@ -34,13 +39,11 @@ function Get-AHPolicyByResource {
                 $item = Get-PolicyInfoHelper -PolicyDefinitionId $Policy
                 $item.PolicySetId = $Assignment.Properties.PolicyDefinitionId
                 $item.PolicySetDisplayName = $Assignment.Properties.DisplayName
-                #$MyReport += $item
                 $item
             }
         }
         Else {
             #Policy, not policy set
-            #$MyReport += Get-PolicyInfoHelper -PolicyDefinitionId $Assignment.Properties.PolicyDefinitionId
             Get-PolicyInfoHelper -PolicyDefinitionId $Assignment.Properties.PolicyDefinitionId
         }
     }
@@ -55,8 +58,8 @@ function Get-PolicyInfoHelper {
         $PolicyDefinitionId
     )
 
-    $Definition = Get-AzPolicyDefinition -Id $PolicyDefinitionId
-    $PolicyDefinitionJSON = az policy definition show -n (($PolicyDefinitionId -split ('/'))[-1]) 
+    $Definition = Get-AzPolicyDefinition -Id $PolicyDefinitionId -ea 0
+    $PolicyDefinitionJSON = az policy definition show -n (($PolicyDefinitionId -split ('/'))[-1]) 2>$Null
     $PolicyInfo = [PSCustomObject]@{
         type                 = Find-EqualsInFile -file $PolicyDefinitionJSON
         PolicyDisplayName    = $Definition.Properties.DisplayName

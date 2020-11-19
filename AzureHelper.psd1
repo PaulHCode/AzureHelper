@@ -66,10 +66,10 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport = '*'
+    FunctionsToExport = '*' #@('Get-PolicyInfoHelper', 'Find-EqualsInFile', 'Get-AHPolicyByResource', 'Add-AHPolicyToReport', 'Get-AHAppliedPolicies', 'Get-AHBackedUpVMs', 'Get-AHComplianceReport', 'Get-AHDBAllocation', 'Get-AHExtraDiskGBPaidFor', 'Get-AHNonCompliantResources', 'Get-AHNonHubWindowsServers', 'Get-AHPolicyAssignment', 'Get-AHPolicyToReport', 'Get-AHRegulationCompliance', 'Get-AHResourceCompliance', 'Get-AHResourceCost', 'Get-AHSavingsReport', 'Get-AHSecurityReport', 'Get-AHStaleUsers', 'Get-AHUnusedDisks', 'Get-AHUnusedNICs', 'Get-AHUnusedPIPs', 'Get-AHVMBackupStatus', 'Get-AHVMDomainStatus', 'Get-PolicyByResource', 'Invoke-AzureCommand', 'New-AHRoute', 'Remove-AHPolicyToReport', 'Remove-AHVM', 'Resize-AHVM', 'Select-AHSubscription') #'*'
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-    CmdletsToExport   = '*'
+    CmdletsToExport   = '*' #@('Get-AHPolicyByResource', 'Add-AHPolicyToReport', 'Get-AHAppliedPolicies', 'Get-AHBackedUpVMs', 'Get-AHComplianceReport', 'Get-AHDBAllocation', 'Get-AHExtraDiskGBPaidFor', 'Get-AHNonCompliantResources', 'Get-AHNonHubWindowsServers', 'Get-AHPolicyAssignment', 'Get-AHPolicyToReport', 'Get-AHRegulationCompliance', 'Get-AHResourceCompliance', 'Get-AHResourceCost', 'Get-AHSavingsReport', 'Get-AHSecurityReport', 'Get-AHStaleUsers', 'Get-AHUnusedDisks', 'Get-AHUnusedNICs', 'Get-AHUnusedPIPs', 'Get-AHVMBackupStatus', 'Get-AHVMDomainStatus', 'Get-PolicyByResource', 'Invoke-AzureCommand', 'New-AHRoute', 'Remove-AHPolicyToReport', 'Remove-AHVM', 'Resize-AHVM', 'Select-AHSubscription') #'*'
 
     # Variables to export from this module
     VariablesToExport = '*'
@@ -120,7 +120,7 @@
     } # End of PrivateData hashtable
 
     # HelpInfo URI of this module
-    # HelpInfoURI = ''
+    # HelpInfoURI       = ''
 
     # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
     # DefaultCommandPrefix = ''

@@ -5,6 +5,7 @@
         https://gallery.technet.microsoft.com/Report-on-Azure-AD-Stale-8e64c1c5/edit?newSession=True
     
         #I tweaked it for my purposes
+        #This appears to not work in PS 7.0.3 but worked fine in Windows PS 5.1 due to some problem with the AzureAD module in PS 7
 #>
 
 Function Get-AHStaleUsers {
@@ -13,7 +14,7 @@ Function Get-AHStaleUsers {
     Gets a list of stale AAD users.
 
 .DESCRIPTION
-    Gets a list of AAD users older than ($MaAgeMultiFactor + $StaleAgeInDays) days old.
+    Gets a list of AAD users older than ($MaxAgeMultiFactor + $StaleAgeInDays) days old.
     This command may not work properly in PS Core.  I recommend running it on 5.1 Desktop.
 
 .PARAMETER InstallRequiredModules
@@ -41,11 +42,17 @@ Function Get-AHStaleUsers {
 .OUTPUTS
     System.Management.Automation.PSCustomObject
 
-.REMARKS
-    This is a test
+.LINK
+
+    https://blogs.technet.microsoft.com/undocumentedfeatures/2018/06/22/how-to-find-staleish-azure-b2b-guest-accounts/
+
+.LINK
+
+    https://gallery.technet.microsoft.com/Report-on-Azure-AD-Stale-8e64c1c5/edit?newSession=True
 
 .NOTES
     Author:  Paul Harrison
+    Copied a lot of the code from: Aaron Guilmette
 #>
     [CmdletBinding()]
     param (
@@ -117,8 +124,6 @@ Function Get-AHStaleUsers {
         }
     }
 
-    #Write-Host "MaxAgeMultiFactor = $MaxAgeMultiFactor"
-    # VerifyMaxAgeMultiFactor
     If ($MaxAgeMultiFactor -lt 1) { throw { "MaxAgeMultiFactor must be greater than 0." } }
 
 

@@ -73,5 +73,6 @@ function Invoke-AzureCommand {
             $subCount++
         }
         $null = Set-AzContext $currentSub
+        
     }
 }
