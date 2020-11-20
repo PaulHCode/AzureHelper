@@ -42,6 +42,6 @@ This module is comprised of useful cmdlets I have written to make my work easier
 - Get-AHRegulationCompliance - Gets regulatory compliance of the regulation specified and generates a report showing compliance with each control in the regulation.
 - Get-AHResourceCompliance - Prompts the user to select an Azure Policy then returns a list of resources that are not comnpliant with the policy.
   > These functions select policies to determine what Get-AHSecurityReport reports on
-- Add-AHPolicyToReport
-- Remove-AHPolicyToReport
-- Get-AHPolicyToReport
+- Add-AHPolicyToReport - Adds a PolicyID to the list of a Azure policies to be analyzed.
+- Remove-AHPolicyToReport - Removes a PolicyID from the list of a Azure policies to be analyzed.
+- Get-AHPolicyToReport - List the Azure policies to be analyzed.
