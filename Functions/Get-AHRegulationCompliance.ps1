@@ -1,6 +1,41 @@
 
 
 Function Get-AHRegulationCompliance {
+    <#
+.SYNOPSIS
+    Gets regulatory compliance of the regulation specified and generates a report showing compliance with each control in the regulation.
+.DESCRIPTION
+.PARAMETER AllSubscriptions
+    Run this command against all subscriptions.
+.PARAMETER Subscription
+    Specifies the subscription to run against. The default is the current subscription.
+.PARAMETER Regulation
+    Specifies the regulation out of the Regulations.json file to check for compliance with.  The file is extensible and easily modified to customize and add additional regulations.
+.PARAMETER RegulationFile
+    The file that has the regulations stored in it.
+.PARAMETER Summary
+    Summarize the results
+.PARAMETER Parallel
+    Enables parallel execution so that all regulations are checked simultaneously.  This must not be used at the same time as AllSubscriptions.
+.EXAMPLE
+    $results = Get-AHRegulationCompliance -Regulation "DoD 800-53R4" -Parallel
+
+    #This finds regulatory compliance with DoD 800-53R4 for the current subscription.
+.EXAMPLE
+    $results = Get-AHRegulationCompliance -Regulation "DoD 800-53R4" -AllSubscriptions
+
+    #This gets regulatory compliance with DoD 800-53R4 across all subscriptions.  
+.EXAMPLE
+    $results = Get-AHRegulationCompliance -Regulation "DoD 800-53R4" -AllSubscriptions -Summary
+
+    #This gets regulatory compliance with DoD 800-53R4 across all subscriptions then summarizes it by control.  This report makes it easy to find how many resources are not compliant with each control in an entire tenant.
+.INPUTS
+    String
+.OUTPUTS
+    System.Management.Automation.PSCustomObject
+.NOTES
+    Author:  Paul Harrison
+#>
     [CmdletBinding()]
     param (
         [Switch]

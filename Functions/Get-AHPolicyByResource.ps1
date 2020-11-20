@@ -1,11 +1,3 @@
-
-
-
-
-
-#Get all policies and group them by resources impacted
-
-#$MyReport = @()
 function Get-AHPolicyByResource {
     <#
     .SYNOPSIS
