@@ -4,6 +4,7 @@
 Functions/Copy-AHToAzure.ps1
 Functions/Get-AHGUIInput.ps1
 Funcitons/RegulationTest.json
+Functions/Get-AHContextToken.ps1
 #Functions/Get-AHBackedUpVMs.ps1
 #Functions/Remove-AHVirtualMachine.ps1
 #Functions/Remove-AHVM.ps1
