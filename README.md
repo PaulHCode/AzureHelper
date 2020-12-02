@@ -17,6 +17,41 @@ This module is comprised of useful cmdlets I have written to make my work easier
 - Get-AHSavingsReport - Retrieves a list of changes that can be made to a subscription to cut costs
 - Get-AHStaleUsers - Gets a list of stale AAD users (mostly copied from Aaron Guilmette with a few tweaks)
 
+## Add/Remove access to resources restricted by IP address
+
+> These cmdlets make it easier to add/remove access to resources that are restricted by IP address. Currently only key vaults, storage accounts, and sql servers are supported but more resources can be added if folks find this useful.
+
+- Add-AHMyIPToResources - Gives you access to the resources previously selected
+- Get-AHResourceToAddMyIPTo - Lists the resources to add/remove access from
+- Remove-AHResourceToAddMyIPTo - Removes access to the resources
+- Export-AHMyResourcesToAddMyIPTo - Exports the list of resources for use later
+- Import-AHMyResourcesToAddMyIPTo - Imports the list of resources you saved earlier
+- Remove-AHMyIPFromResources - Removes the \$IPAddress passed in from the Azure resources
+- Get-AHMyPublicIP - Gets your IP as seen by Azure and the interweb
+
+```PowerShell
+  #Example usage
+  #Add the RG that has the resources I want to access to the list
+  Add-AHResourceToAddMyIPTo -ResourceGroupName MyResourceGroup1
+  Add-AHResourceToAddMyIPTo -ResourceId /subscriptions/xxxxxxxx-a123-asdf-1234-123456abcdef/resourceGroups/Test1RG/providers/Microsoft.KeyVault/vaults/KV5
+  #Give myself access to those resources
+  Add-AHMyIPToResources
+  #Check which resources I have in my list
+  Get-AHResourceToAddMyIPTo | Format-List
+  #Export them for use later
+  Export-AHResourcesToAddMyIPTo -Path 'C:\folder\ResourceINeedAccessTo.csv'
+  #Remove access to resources I don't need to access anymore
+  Remove-AHMyIPFromResources -IPAddress (Get-AHMyPublicIPAddress)
+  #Clear the list in use
+  (Get-AHResourceToAddMyIPTo).Id | Remove-AHResourceToAddMyIPTo
+  #Add another list for other resources you work with
+  Import-AHResourcesToAddMyIPTo  -Path 'C:\folder\TheOtherResourcesINeedAccessTo.csv'
+  #Verify that they are the right ones
+  Get-AHResourceToAddMyIPTo
+  #Give myself access to those resources
+  Add-AHMyIPToResources
+```
+
 ## Inventory Functions
 
 - Get-AHAppliedPolicies - Gets the Azure Policies applied to \$ResourceId that Deny or DeployIfNotExists

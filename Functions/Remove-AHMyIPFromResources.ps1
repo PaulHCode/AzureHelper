@@ -1,10 +1,11 @@
 Function Remove-AHMyIPFromResources {
     <#
 .SYNOPSIS
-    Adds your public IP address to the firewall rules.
+    Removes your public IP address from the firewall rules.
 .DESCRIPTION
-    Adds your public IP as determined by Get-AHMyPublicIPAddress to the resources that you can check using Get-AHResourceToAddMyIPTo
+    Removes your public IP as determined by Get-AHMyPublicIPAddress from the resources that you can check using Get-AHResourceToAddMyIPTo
 .EXAMPLE
+    
 .EXAMPLE
 .EXAMPLE
 .INPUTS
