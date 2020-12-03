@@ -5,8 +5,27 @@ Function Add-AHMyIPToResources {
 .DESCRIPTION
     Adds your public IP as determined by Get-AHMyPublicIPAddress to the resources that you can check using Get-AHResourceToAddMyIPTo
 .EXAMPLE
+    Add-AHMyIPToResources
 .EXAMPLE
-.EXAMPLE
+  #Add the RG that has the resources I want to access to the list
+  Add-AHResourceToAddMyIPTo -ResourceGroupName MyResourceGroup1
+  Add-AHResourceToAddMyIPTo -ResourceId /subscriptions/xxxxxxxx-a123-asdf-1234-123456abcdef/resourceGroups/Test1RG/providers/Microsoft.KeyVault/vaults/KV5
+  #Give myself access to those resources
+  Add-AHMyIPToResources
+  #Check which resources I have in my list
+  Get-AHResourceToAddMyIPTo | Format-List
+  #Export them for use later
+  Export-AHResourcesToAddMyIPTo -Path 'C:\folder\ResourceINeedAccessTo.csv'
+  #Remove access to resources I don't need to access anymore
+  Remove-AHMyIPFromResources -IPAddress (Get-AHMyPublicIPAddress)
+  #Clear the list in use
+  (Get-AHResourceToAddMyIPTo).Id | Remove-AHResourceToAddMyIPTo
+  #Add another list for other resources you work with
+  Import-AHResourcesToAddMyIPTo  -Path 'C:\folder\TheOtherResourcesINeedAccessTo.csv'
+  #Verify that they are the right ones
+  Get-AHResourceToAddMyIPTo
+  #Give myself access to those resources
+  Add-AHMyIPToResources
 .INPUTS
     String
 .OUTPUTS
@@ -56,6 +75,38 @@ Function Add-AHMyIPToResourcesHelper {
         'Microsoft.Sql/servers' { Add-AHMyIPToSQLServer -Id $Id }
         Default { Write-Warning "The type $Type is not supported. Resource ID $Id was not modified." }
     }
+
+}
+
+Function Add-AHMyIPToContainerRegistry {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [string]
+        $Id
+    )
+    $CR = Get-AzResource -Id $Id
+    If (-not $?) {
+        #The resource no longer exists
+        return 
+    }
+
+    #Validate the IP doesn't already exist otherwise there will be duplicates.
+    If ($Null -ne $CR.Properties.NetworkRuleSet.IpRules -and $CR.Properties.NetworkRuleSet.IpRules.Value.Contains($Script:MyPublicIPAddress)) {
+        Write-Verbose "The IP $Script:MyPublicIPAddress was already allowed on $($CR.ResourceName) in $($CR.ResourceGroupName)."
+    }
+    Else {
+        <#
+        $NewIP = [PSCustomObject]@{
+            action = 'Allow'
+            value  = $Script:MyPublicIPAddress
+        }
+        $NewIPRule = $CR.Properties.NetworkRuleSet.IpRules + $NewIP
+        #>
+        $rule = New-AzContainerRegistryNetworkRule -IPRule -IPAddressOrRange $Script:MyPublicIPAddress 
+        Set-AzContainerRegistryNetworkRuleSet  #-Name $sa.StorageAccountName -ResourceGroupName $SA.ResourceGroupName -IPRule $NewIPRule
+    }
+
 
 }
 

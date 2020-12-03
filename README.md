@@ -7,6 +7,13 @@ This module is comprised of useful cmdlets I have written to make my work easier
 > These functions are ones that I use just to make my daily work easier
 
 - Invoke-AzureCommand - Runs a script block against every subscription using -AllSubscriptions
+
+```PowerShell
+  #Get resource groups from every subscription
+  $MyScriptBlock = {Get-AzResourceGroup}
+  $Results = Invoke-AzureCommand -ScriptBlock $MyScriptBlock -AllSubscriptions
+```
+
 - Select-AHSubscription -GUI to show which subscriptions I have access to then Set-AzContext to it
 - Move-AHVMFromDedicatedHost - Moves a VM from a dedicated host
 - Move-AHVMToDedicatedHost - Moves a VM to the specified dedicated host
