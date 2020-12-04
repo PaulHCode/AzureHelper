@@ -30,7 +30,7 @@ Function Get-AHBackedUpVMs {
     )
     begin {
         $MyScriptBlock = {
-            #$fgColor = [console]::ForegroundColor
+            #$fgColor = [console]::ForegroundColor            # I had a problem with the color changing... strange stuff, uncomment this if it returns
             try { az account set --subscription ((Get-AzContext).Subscription.Id) }
             catch { throw }
             $sub = ((Get-AzContext).Subscription.Name)
@@ -51,7 +51,7 @@ Function Get-AHBackedUpVMs {
                     $VMList += $VM
                 }
             }
-            #[console]::ForegroundColor = $fgColor
+            #[console]::ForegroundColor = $fgColor            # I had a problem with the color changing... strange stuff, uncomment this if it returns
             $VMList
         }
     }

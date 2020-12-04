@@ -96,18 +96,9 @@ Function Add-AHMyIPToContainerRegistry {
         Write-Verbose "The IP $Script:MyPublicIPAddress was already allowed on $($CR.ResourceName) in $($CR.ResourceGroupName)."
     }
     Else {
-        <#
-        $NewIP = [PSCustomObject]@{
-            action = 'Allow'
-            value  = $Script:MyPublicIPAddress
-        }
-        $NewIPRule = $CR.Properties.NetworkRuleSet.IpRules + $NewIP
-        #>
         $rule = New-AzContainerRegistryNetworkRule -IPRule -IPAddressOrRange $Script:MyPublicIPAddress 
-        Set-AzContainerRegistryNetworkRuleSet  #-Name $sa.StorageAccountName -ResourceGroupName $SA.ResourceGroupName -IPRule $NewIPRule
+        Set-AzContainerRegistryNetworkRuleSet  
     }
-
-
 }
 
 Function Add-AHMyIPToSQLServer {

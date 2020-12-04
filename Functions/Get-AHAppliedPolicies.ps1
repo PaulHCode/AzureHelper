@@ -27,18 +27,19 @@ Function Get-AHAppliedPolicies {
         [string]
         $ResourceId
     )
-    #I make the terrible assumption that the ResourceId is valid... oh well
+    $Null = Get-AzResource -ResourceId $ResourceId
+    If (!$?) {
+        throw "Invalid ResourceId"
+    }
     $sub = ($ResourceId -split ('/'))[2] 
     If ((az account show | ConvertFrom-Json).id -ne $sub) {
-        try { az account set $sub }
-        catch { throw }
+        az account set $sub 
     }
     If ($((Get-AzContext).Subscription.Id -ne $sub)) {
-        try { Set-AzContext -SubscriptionId $sub }
-        catch { throw }
+        Set-AzContext -SubscriptionId $sub 
     }
 
-    $Policies = az policy state list --resource $ResourceId | ConvertFrom-Json #| Where-Object { $_.PolicyDefinitionAction -in @('deny', 'deployifnotexists') }
+    $Policies = az policy state list --resource $ResourceId | ConvertFrom-Json 
 
     ForEach ($Policy in $Policies) {
         Get-AzPolicyAssignment -Id $($Policy.PolicyAssignmentId) | 

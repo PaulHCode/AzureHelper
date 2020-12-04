@@ -43,6 +43,7 @@ function Get-AHExtraDiskGBPaidFor {
             param(
                 $disk
             )
+            # I should get these programatically but I don't use this function much or care to fix this
             $PList = @(4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32767) #premium ssd
             $EList = @(4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32767) #standard ssd
             $SList = @(32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32767) #standard hdd

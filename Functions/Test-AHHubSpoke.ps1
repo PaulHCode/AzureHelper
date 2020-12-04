@@ -1,5 +1,20 @@
 
 Function Test-AHHubSpoke {
+    <#
+.SYNOPSIS
+    Checks vNet peerings for compliance with a hub and spoke design
+.DESCRIPTION
+    Checks for compliance with a hub/spoke design and if non-compliant it gives suggestions for compliance.
+.EXAMPLE
+    
+.INPUTS
+    String
+.OUTPUTS
+    System.Management.Automation.PSCustomObject
+.NOTES
+    Author:  Paul Harrison
+.LINK
+#>
     [CmdletBinding()]
     param (
         [Parameter()]

@@ -47,12 +47,8 @@ Function Move-AHVMToDedicatedHost {
         $StartVMAfterMove
     )
 
-    #    write-psfmessage -level VeryVerbose -message "Attempting to move VM named $VMName in RG $VMResourceGroup to host $Hostname in host group $hostgroup in RG $hostresourcegroup with DeallocateIfNeeded set to $deallocateifneeded and StartVMAfterMove set to $startvmaftermove"
-
-    try {
-        $DedicatedHost = Get-AzHost -HostGroupName $HostGroup -ResourceGroupName $HostResourceGroup -Name $HostName
-    }
-    catch {
+    $DedicatedHost = Get-AzHost -HostGroupName $HostGroup -ResourceGroupName $HostResourceGroup -Name $HostName
+    IF (!$?) {
         throw "Error finding dedicated host"            
     }
     If (!$DedicatedHost) {

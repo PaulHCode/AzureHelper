@@ -32,6 +32,6 @@ Function Select-AHSubscription {
             $sub = (Get-AzSubscription | Select-Object Name, Id, State | Out-GridView -PassThru -Title "Select the subscription to use")
         }
     }
-    try { Set-AzContext $($sub.id) }
-    catch { throw }
+    Set-AzContext $($sub.id) 
+    
 }
