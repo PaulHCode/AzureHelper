@@ -100,7 +100,7 @@ Function Get-AHStaleUsers {
 
     # Check for existing Azure AD Connection
     Try {
-        $TestAzureAD = Get-AzureADTenantDetail
+        Test-AHEnvironment
     }
     Catch [Microsoft.Open.Azure.AD.CommonLibrary.AadNeedAuthenticationException] {
         Write-Verbose "You're not connected.";

@@ -46,7 +46,7 @@ Function Get-AHVMDomainStatus {
         }
 
         $domain = ([adsi]'').distinguishedName -replace (",DC=", '.') -replace ("DC=", '') #(get-addomain).name
-        $Subscription = (get-azcontext).subscription.name
+        #$Subscription = (get-azcontext).subscription.name
         $VMCounter = 0
         write-verbose "Checking if each VM in $((get-azcontext).subscription.name) is domain joined to $domain"
     }
