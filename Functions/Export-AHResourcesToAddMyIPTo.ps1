@@ -3,23 +3,23 @@ Function Export-AHResourcesToAddMyIPTo {
     param (
         [Parameter(Mandatory = $true)]
         [string]
-        $Path
+        $Path,
+        [Parameter()]
+        [Switch]
+        $Force
     )
 
     If (Test-Path(Split-Path $Path -Parent)) {
         #Parent exists
         If (Test-Path $Path) {
             #Child exists
-            While ($private:answer -ne 'y' -and $private:answer -ne 'n') {
-                $private:answer = (Read-Host -Prompt "The file $Path already exists. Overwrite? (y/n)").ToLower()
-            }
-            If ('n' -eq $private:answer) {
-                throw "Declined to overwrite, aborting."
+            If (-not $Force) {
+                throw "The file already exists, use -Force to overwrite."
             }
         }
     }
     Else {
-        Throw "The path to $Path does not exist."
+        Throw "Invalid Path. The path to $Path does not exist."
     }
 
     If ($Null -eq $Script:ResourceToAddMyIPTo) {
