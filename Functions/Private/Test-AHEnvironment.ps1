@@ -1,6 +1,6 @@
 
 Function Test-AHEnvironment {
-        <#
+    <#
 .SYNOPSIS
     Validates the environment is ready for use.
 .DESCRIPTION
