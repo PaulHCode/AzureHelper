@@ -17,7 +17,7 @@ function Invoke-AzureCommand {
 .PARAMETER Subscription
     Specifies the subscription to run against. The default is the current subscription.
 .EXAMPLE
-     Invoke-AllSubs -ScriptBlock ([scriptblock]::Create('write-host "hello world from $((get-azcontext).name)"'))
+     Invoke-AzureCommand -ScriptBlock ([scriptblock]::Create('write-host "hello world from $((get-azcontext).name)"')) -AllSubscriptions
 .EXAMPLE
      $DiskScriptBlock = {Get-AzDisk | Where{$_.DiskSizeGB -gt 512}}
     Invoke-AzureCommand -AllSubscriptions -ScriptBlock $DiskScriptBlock | FT ResourceGroupName, Name, DiskSizeGB
