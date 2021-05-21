@@ -33,7 +33,7 @@ Function Get-AHAppliedPolicies {
     }
     $sub = ($ResourceId -split ('/'))[2] 
     If ((az account show | ConvertFrom-Json).id -ne $sub) {
-        az account set $sub 
+        az account set --Subscription $sub 
     }
     If ($((Get-AzContext).Subscription.Id -ne $sub)) {
         Set-AzContext -SubscriptionId $sub 
