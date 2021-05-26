@@ -16,11 +16,13 @@ Function Get-AHMyPublicIPAddress {
     Author:  Paul Harrison
 #>
 
-    $MyIP = (Invoke-WebRequest -uri "http://ifconfig.me/ip").Content
-    If ($MyIP -as [IPAddress] -as [Bool]) {
-        $MyIP
+    $response = Invoke-RestMethod -Uri "http://ifconfig.me/ip"
+        
+    # casting response to IPAddress class and get the result as a Bool
+    if ( $response -as [IPAddress] -as [Bool] ) {
+        return $response
     }
     else {
-        throw 'Error getting your public IP address.'
+        throw 'Error getting your public IP address'
     }
 }
