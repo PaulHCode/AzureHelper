@@ -30,15 +30,15 @@ Function Add-AHPolicyToReport {
 #>
     [CmdletBinding()]
     param(
-        [Parameter(ParameterSetName = "CLI", Mandatory = $true, ValueFromPipeline = $true)]
+        [Parameter(ParameterSetName = "CLI", Mandatory = $false, ValueFromPipeline = $true)]
         [string]
         $PolicyDefinitionID,
 
-        [Parameter(ParameterSetName = "GUI", Mandatory = $true)]
+        [Parameter(ParameterSetName = "GUI", Mandatory = $false)]
         [switch]
         $GUI,
 
-        [parameter(ParameterSetName = "AllCustom", Mandatory = $true)]
+        [parameter(ParameterSetName = "AllCustom", Mandatory = $false)]
         [switch]
         $AllCustom
     )
