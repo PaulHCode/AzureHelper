@@ -4,9 +4,10 @@
 .DESCRIPTION
    Exports an Azure Policy Initiative definition (also known as a policy set) and the associated policy definitions
 .EXAMPLE
-   Export-PolicySet -PolicySetDefinitionId '/providers/Microsoft.Management/managementGroups/TestManagementGroup0/providers/Microsoft.Authorization/policySetDefinitions/General Policies V2' -Force
+   Export-AHPolicySetDefinition -PolicySetDefinitionId '/providers/Microsoft.Management/managementGroups/TestManagementGroup0/providers/Microsoft.Authorization/policySetDefinitions/General Policies V2' -Force
 .EXAMPLE
-   Another example of how to use this cmdlet I'll put in later
+   
+   I'm lazy, so if I want to export a ton of policy sets but I don't want to type out a bunch of stuff I use this
 .NOTES
    You can use the following one-liner to help you find the policy set definition ID you want
    Get-AzPolicySetDefinition | select @{N='Initiative';E={$_.Properties.DisplayName}}, resourceId | ogv -PassThru
@@ -17,27 +18,33 @@
 .PARAMETER Force
    Forces the overwriting of an existing policy set even if the folder already exists
 #>
-function Export-AHPolicySet {
+function Export-AHPolicySetDefinition {
     [CmdletBinding()]
     param (
+        [Parameter(Mandatory = $true)]
         [string]
         [ValidateScript({
                 $result = Get-AzPolicySetDefinition -id $_
                 If ($result.GetType().Name -eq 'PsPolicySetDefinition' -or $result.GetType().BaseType.Name -eq 'Object') { $true }Else { $false }
             })]
         $PolicySetDefinitionId,
+        [Parameter(Mandatory = $false)]
         [string]
         [ValidateScript({
                 test-path $_
             })]
         $OutputDir = '.', #set to . by default and validate it is valid
+        [Parameter(Mandatory = $false)]
+        [int]
+        [ValidateRange(10, 100)]
+        $NumChars = 40,
         [switch]
         $Force #include to overwrite directory
         
     )
     
     begin {
-        $numchars = 30 #number of characters to use of the display name before truncating - we don't want 300 character file names
+        $numchars = 40 #number of characters to use of the display name before truncating - we don't want 300 character file names
         #define helper function
         function Copy-Property {
             [CmdletBinding()]
@@ -88,7 +95,17 @@ function Export-AHPolicySet {
             #EndRegion
 
             #Region Export each policy definition
-            #I need to know exactly how to format each policy export first this will likely call another function that exports each policy definition
+            $nonce = 0 #introduce a nonce in case the first $numChars of a policy description are identical
+            ForEach ($item in $policySet.Properties.PolicyDefinitions) {
+                
+                #$fileName = If ($item.policyDefinitionReferenceId.Length -le $numchars) { $item.policyDefinitionReferenceId }else { $item.policyDefinitionReferenceId.Substring(0, $numchars - 1) }
+                #$policy = Get-AzPolicyDefinition -id $item.policyDefinitionId
+                #$proposedName = $policy.Properties.DisplayName# + $nonce
+                #$fileName = If ($proposedName.Length + $($nonce.tostring().length) -le $numchars) { $proposedName + $nonce.tostring() }else { $proposedName.Substring(0, $numchars - 1 - $($nonce.ToString().Length)) + $nonce.ToString() }
+                $fileName = If ($item.policyDefinitionReferenceId.Length -le $numchars) { $item.policyDefinitionReferenceId }else { $item.policyDefinitionReferenceId.Substring(0, $numchars - 1) }
+                Export-AHPolicyDefinition -PolicyDefinitionId $item.policyDefinitionId | Out-File "$folderPath\$filename.json"
+                $nonce += 1
+            }
             #EndRegion
         }
     }
