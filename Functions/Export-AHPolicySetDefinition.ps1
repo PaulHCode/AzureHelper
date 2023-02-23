@@ -10,7 +10,8 @@
    I'm lazy, so if I want to export a ton of policy sets but I don't want to type out a bunch of stuff I use this
 .NOTES
    You can use the following one-liner to help you find the policy set definition ID you want
-   Get-AzPolicySetDefinition | select @{N='Initiative';E={$_.Properties.DisplayName}}, resourceId | ogv -PassThru
+   $MyPolicySets = Get-AzPolicySetDefinition | select @{N='DisplayName';E={$_.Properties.DisplayName}}, @{N='Description';E={$_.Properties.Description}}, resourceId | ogv -PassThru
+   ($MyPolicySet).ResourceId | %{Export-AHPolicySetDefinition -PolicySetDefinitionId $_ -OutputDir 'C:\myPolicies'}
 .PARAMETER PolicySetDefinitionId
    The PolicySet definition Id to export
 .PARAMETER OutputDir
@@ -103,6 +104,7 @@ function Export-AHPolicySetDefinition {
                 #$proposedName = $policy.Properties.DisplayName# + $nonce
                 #$fileName = If ($proposedName.Length + $($nonce.tostring().length) -le $numchars) { $proposedName + $nonce.tostring() }else { $proposedName.Substring(0, $numchars - 1 - $($nonce.ToString().Length)) + $nonce.ToString() }
                 $fileName = If ($item.policyDefinitionReferenceId.Length -le $numchars) { $item.policyDefinitionReferenceId }else { $item.policyDefinitionReferenceId.Substring(0, $numchars - 1) }
+                $fileName += $item.policyDefinitionId.split('/')[-1] # just in case the first $numChars of the policyDefinitionReferenceId are the same on a bunch of policies in a policy set
                 Export-AHPolicyDefinition -PolicyDefinitionId $item.policyDefinitionId | Out-File "$folderPath\$filename.json"
                 $nonce += 1
             }

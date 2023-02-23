@@ -4,11 +4,11 @@
 .DESCRIPTION
    Exports an Azure Policy  definition
 .EXAMPLE
-   Export-AHPolicyDefinition -PolicyDefinitionId '/subscriptions/abcdefgh-asdf-1234-95a8-b0a850169e3c/providers/Microsoft.Authorization/policyDefinitions/george' | out-file .\MyPolicyNamedGeorge.json
+   Export-AHPolicyDefinition -PolicyDefinitionId '/subscriptions/11111111-1111-1111-1111-111111111111/providers/Microsoft.Authorization/policyDefinitions/george' | out-file .\MyPolicyNamedGeorge.json
 
    This example outputs george to a file 
 .EXAMPLE
-    Export-AHPolicyDefinition -PolicyDefinitionId '/subscriptions/abcdefgh-asdf-1234-95a8-b0a850169e3c/providers/Microsoft.Authorization/policyDefinitions/george'
+    Export-AHPolicyDefinition -PolicyDefinitionId '/subscriptions/11111111-1111-1111-1111-111111111111/providers/Microsoft.Authorization/policyDefinitions/george'
 
     This example just shows me what george would look like on the screen
 .NOTES
@@ -31,7 +31,6 @@ function Export-AHPolicyDefinition {
         $PolicyDefinitionId
     )
     begin {
-        #$numchars = 30 #number of characters to use of the display name before truncating - we don't want 300 character file names
     }
     process {
         $original = Get-AzPolicyDefinition -id $PolicyDefinitionId
