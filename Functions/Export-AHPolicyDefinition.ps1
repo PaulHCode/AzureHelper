@@ -31,7 +31,7 @@ function Export-AHPolicyDefinition {
         $PolicyDefinitionId
     )
     begin {
-        $numchars = 30 #number of characters to use of the display name before truncating - we don't want 300 character file names
+        #$numchars = 30 #number of characters to use of the display name before truncating - we don't want 300 character file names
     }
     process {
         $original = Get-AzPolicyDefinition -id $PolicyDefinitionId

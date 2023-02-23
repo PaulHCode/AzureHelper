@@ -73,7 +73,7 @@ function Export-AHPolicySetDefinition {
         ForEach ($policySet in $policySets) {
             #Region Create folder for the initiative
             $folderName = If ($policySet.Properties.DisplayName.Length -le $numchars) { $policySet.Properties.DisplayName }else { $policySet.Properties.DisplayName.Substring(0, $numchars - 1) }
-            $folderName += $policySet.Name
+            #$folderName += $policySet.Name
             $folderPath = Join-Path $OutputDir $folderName
             If (Test-Path $folderPath) {
                 If ($Force) {
