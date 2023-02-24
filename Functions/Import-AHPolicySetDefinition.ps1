@@ -110,7 +110,12 @@ function Import-AHPolicySetDefinition {
                                 $PolicyDefinitionSplat = @{}
                                 If (![string]::IsNullOrEmpty($policy.Properties.DisplayName)) { $PolicyDefinitionSplat.Add('DisplayName', $($policy.Properties.DisplayName)) }
                                 If (![string]::IsNullOrEmpty($policy.Properties.Description)) { $PolicyDefinitionSplat.Add('Description', $($policy.Properties.Description)) }
-                                New-AzPolicyDefinition @PolicyDefinitionSplat -Name $policy.Name -Policy $file
+                                $result = New-AzPolicyDefinition @PolicyDefinitionSplat -Name $policy.Name -Policy $file #-ErrorAction Break
+                                Write-Verbose @"
+
+Name: $($result.Name)
+ResourceId: $($result.ResourceId)
+"@
                         }
                 }
 
@@ -138,8 +143,14 @@ handle ManagementGroupName problems here
 
 
                 #autofill policySetDescription depending on metadata? maybe not, maybe force the user to do it since it is a new environemnt... we'll see
-                New-AzPolicySetDefinition -PolicyDefinition $PolicySetDefinitionFile -Parameter $PolicySetParameterFile -Name $PolicySetName -Description $PolicySetDescription -ManagementGroupName $ManagementGroupName
+                $result = New-AzPolicySetDefinition -PolicyDefinition $PolicySetDefinitionFile -Parameter $PolicySetParameterFile -Name $PolicySetName -Description $PolicySetDescription -ManagementGroupName $ManagementGroupName
+                Write-Verbose @"
+
+Name: $($result.Name)
+ResourceId: $($result.ResourceId)
+"@
         }
+
         end {
 
         }
