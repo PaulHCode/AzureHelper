@@ -1,54 +1,3 @@
-<#
-I'm not sure if this is worth writing yet since it is pretty easy to use:
-
-New-AzPolicySetDefinition -PolicyDefinition <PolicySetDefinition JSON> -Parameter <PolicySetParameters JSON> -Name <Name> -Description <Description>
-
-The only reasons I'm considering writing this is because: 
-- the export's policyDefinitionIds are going to reference the source locations instead of the destination locations so I could help the user through this
-- I could automatically import all necessary policy definitions for the policy set
-
-Parameters
-        - PolicySetDefinition JSON
-        - PolicySetParameters JSON
-        - Name
-        - Description
-        - Where to import the policy definition to (management group name or subscription name)
-
-
-#>
-
-
-
-<#
-$NewManagementGroup = 'TestManagementGroup0'
-$temp = Get-Content '.\General Policies V2\General Policies V2-Policy.json' -Raw | convertfrom-json
-$NewPolicy = ForEach ($i in $temp) {
-    If ($i.PolicyDefinitionId -like '*/managementGroups/*') {
-        #get managementGroup Name then replace it
-        $arr = $i.PolicyDefinitionId.split('/')
-        $managementGroupIndex = $arr.IndexOf('managementGroups') + 1
-        $arr[$managementGroupIndex] = $NewManagementGroup
-        $NewPolicyDefinitionId = $arr -join ('/')
-        $i.PolicyDefinitionId = $NewPolicyDefinitionId
-        $i
-    }
-    Else {
-        $i
-    }
-}
-$NewPolicy | ConvertTo-Json -Depth 99 | Out-File '.\General Policies V2\test.json'
-#New-AzPolicySetDefinition -PolicyDefinition '.\General Policies V2\General Policies V2-Policy.json' -Parameter '.\General Policies V2\General Policies V2-Parameters.json' -Name 'Frank' -Description 'Frank' -ManagementGroupName 'TestManagementGroup0'
-New-AzPolicySetDefinition -PolicyDefinition '.\General Policies V2\test.json' -Parameter '.\General Policies V2\General Policies V2-Parameters.json' -Name 'Frank' -Description 'Frank' -ManagementGroupName 'TestManagementGroup0'
-
-#>
-
-
-
-
-
-
-
-
 
 <#
 .Synopsis
@@ -204,7 +153,7 @@ ResourceId: $($result.ResourceId)
 
 
                 ##handle ManagementGroupName problems here - since the Policy Set's policyDefinitionId is overwritten anyway, this section is no longer needed if the policy didn't exist and needed to get imported
-                <#
+
                 $temp = Get-Content $PolicySetDefinitionFile -Raw | convertfrom-json -Depth 99
                 $NewPolicy = ForEach ($i in $temp) {
                         If ($i.PolicyDefinitionId -like '*/managementGroups/*') {
@@ -221,7 +170,7 @@ ResourceId: $($result.ResourceId)
                         }
                 }
                 $NewPolicy | ConvertTo-Json -Depth 99 | Out-File $PolicySetDefinitionFile -Force
-#>
+
 
 
 
