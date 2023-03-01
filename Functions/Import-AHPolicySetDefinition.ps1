@@ -7,15 +7,27 @@
    This will overwrite the PolicySetDefinitionFile with the proper ManagementGroupName specified instead of whatever management group is currently there from the export.
    This command assumes any necessary definitions are located in the same directory as the PolicySetDefinitionFile
 .EXAMPLE
-   Import-AHPolicySetDefinition -PolicySetDefinitionId '/providers/Microsoft.Management/managementGroups/TestManagementGroup0/providers/Microsoft.Authorization/policySetDefinitions/General Policies V2' -Force
-.EXAMPLE
-   Another example of how to use this cmdlet I'll put in later
+   $ManagementGroupName = 'MyManagementGroup'
+   $PolicySetDefinitionFile = '.\Initiatives\Custom General V2\Custom General V2-Policy.json'
+   $PolicySetParameterFile = '.\Initiatives\Custom General V2\Custom General V2-Parameters.json'
+   $PolicySetName = 'Custom General V2'
+   Import-AHPolicySetDefinition -PolicySetDefinitionFile $PolicySetDefinitionFile -PolicySetParameterFile $PolicySetParameterFile -PolicySetName $PolicySetName -PolicySetDescription $PolicySetName -ManagementGroupName $ManagementGroupName -IncludeMissingPolicyDefinitions
+
+   This example imports the policy set "Custom General V2". I stored many initiatives in subfolders of the 'initiatives' folder then looped through all of them
 .NOTES
    
 .PARAMETER PolicySetDefinitionFile
    The PolicySet definition file to import
 .PARAMETER PolicySetParameterFile
    The PolicySet parameter file to import
+.PARAMETER PolicySetName
+   The name for the policy set
+.PARAMETER PolicySetDescription
+   The description for the policy set
+.PARAMETER ManagementGroupName
+   The name of the management group to create this policy set in
+.PARAMETER PolicySetCategory
+   This category will be assigned to the policy set definition
 .PARAMETER IncludeMissingPolicyDefinitions
    Imports the policy definitions required for the policy set if they don't already exist in the new environment
 .PARAMETER PurgeExistingPolicyDefinitions
@@ -40,7 +52,10 @@ function Import-AHPolicySetDefinition {
                 [Parameter(Mandatory = $true)]
                 [string]
                 $PolicySetDescription,
-                [Parameter(Mandatory = $true)]
+                [Parameter(Mandatory = $false)]
+                [string]
+                $PolicySetCategory,
+                [Parameter(Mandatory = $false)]
                 [string]
                 [ValidateScript({
                                 $temp = Get-AzManagementGroup $_ -ea 0 -wa 0
@@ -183,6 +198,7 @@ ResourceId: $($result.ResourceId)
                 If (![string]::IsNullOrEmpty($PolicySetName)) { $PolicySetDefinitionSplat.Add('Name', $PolicySetName) }
                 If (![string]::IsNullOrEmpty($PolicySetDescription)) { $PolicySetDefinitionSplat.Add('Description', $PolicySetDescription) }
                 If (![string]::IsNullOrEmpty($ManagementGroupName)) { $PolicySetDefinitionSplat.Add('ManagementGroupName', $ManagementGroupName) }
+                If (![string]::IsNullOrEmpty($PolicySetCategory)){$PolicySetDefinitionSplat.Add('Metadata',"{`"category`":`"$PolicySetCategory`"}")}
                 #                $result = New-AzPolicySetDefinition -PolicyDefinition $PolicySetDefinitionFile -Parameter $PolicySetParameterFile -Name $PolicySetName -Description $PolicySetDescription -ManagementGroupName $ManagementGroupName
                 $result = New-AzPolicySetDefinition @PolicySetDefinitionSplat
                 Write-Verbose @"
