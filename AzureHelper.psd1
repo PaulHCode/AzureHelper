@@ -74,7 +74,8 @@
             'Get-AHVMBackupStatus', 'Get-AHVMDomainStatus', 'Get-AHVnetPeerings', 'Import-AHResourcesToAddMyIPTo', 'Invoke-AzureCommand', `
             'Move-AHVMFromDedicatedHost', 'Move-AHVMToDedicatedHost', 'New-AHRoute', 'Remove-AHMyIPFromResources', 'Remove-AHPolicyToReport', `
             'Remove-AHResourceToAddMyIPTo', 'Remove-AHVM', 'Resize-AHVM', 'Select-AHSubscription', 'Test-AHEnvironment', 'Test-AHHubSpoke', `
-            'Move-AHVVMToAvailabilitySet', 'Export-AHPolicySetDefinition', 'Export-AHPolicyDefinition', 'Import-AHPolicySetDefinition')
+            'Move-AHVVMToAvailabilitySet', 'Export-AHPolicySetDefinition', 'Export-AHPolicyDefinition', 'Import-AHPolicySetDefinition', `
+            'New-AHPolicyExemption')
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport   = '*'
