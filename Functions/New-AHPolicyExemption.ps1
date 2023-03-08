@@ -97,7 +97,7 @@ $descriptionForm.Topmost = $true
     }
 ###    - Get Policy Initiative ID - only display policy defintions for policies that are already assigned
     
-    $PolicySetDefinitionIds = (Get-AzPolicyAssignment -Scope $ManagementGroup.Id ).Properties.PolicyDefinitionId #all policy definitions for assigned policies
+    $PolicySetDefinitionIds = (Get-AzPolicyAssignment -Scope $ManagementGroup.Id -WarningAction SilentlyContinue).Properties.PolicyDefinitionId #all policy definitions for assigned policies
     #some items are policy definitions, others are policy set definitions, get a readable version of each
     #$PolicyChoices = $PolicySetDefinitionIds | Where{$_ -like "*/policyDefinitions/*"}
     $PolicySetChoices = $PolicySetDefinitionIds | Where{$_ -like "*/policySetDefinitions/*"}
@@ -109,7 +109,7 @@ $descriptionForm.Topmost = $true
         throw "One and only one policy set may be selected"
         return
     }
-    $PolicyAssignment = (Get-AzPolicyAssignment -Scope $ManagementGroup.Id -PolicyDefinitionId $PolicySetToAddExemptionTo.ResourceId)
+    $PolicyAssignment = (Get-AzPolicyAssignment -Scope $ManagementGroup.Id -PolicyDefinitionId $PolicySetToAddExemptionTo.ResourceId -WarningAction SilentlyContinue)
 ###    - Get Policy definition within the initiative
     If($PolicySetToAddExemptionTo.ResourceId -like "*/policyDefinitions/*"){
         $PolicyDefinitionToExclude = $PolicySetToAddExemptionTo.ResourceId
