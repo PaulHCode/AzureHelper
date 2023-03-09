@@ -119,8 +119,15 @@ $descriptionForm.Topmost = $true
         $PolicyDefinitionToExclude = (Get-AzPolicySetDefinition -ResourceId $PolicySetToAddExemptionTo.ResourceId).Properties.PolicyDefinitions | ogv -passthru -Title 'Select which policy/policies to add exemptions to within the initiative'
     }
 ###    - Get Resource(s) to exclude
-    $resourceTypeToExclude = (Get-AzResource | group ResourceType).Name | ogv -passthru -Title 'Select which resource type to exclude'
-    $resourcesToExclude = $resourceTypeToExclude | %{get-azresource -ResourceType $_} | ogv -passthru -Title 'Select which specific resources to exclude'
+    $SubscriptionsInThisTenant = Get-AzSubscription -TenantId (get-azcontext).Tenant.id
+    $AllResourceTypesScriptBlock = {(Get-AzResource | group ResourceType).Name}
+    $allResourceTypes = Invoke-AzureCommand -ScriptBlock $AllResourceTypesScriptBlock -Subscription $SubscriptionsInThisTenant | select -Unique
+    #$resourceTypeToExclude = (Get-AzResource | group ResourceType).Name | ogv -passthru -Title 'Select which resource type to exclude'
+    $resourceTypeToExclude = $allResourceTypes | ogv -passthru -Title 'Select which resource type to exclude'
+    $resourcesToExcludeScriptBlock = {$resourceTypeToExclude | %{get-azresource -ResourceType $_}}
+    $resourcesToExcludeAll = Invoke-AzureCommand -ScriptBlock $resourcesToExcludeScriptBlock -Subscription $SubscriptionsInThisTenant
+    #$resourcesToExclude = $resourceTypeToExclude | %{get-azresource -ResourceType $_} | ogv -passthru -Title 'Select which specific resources to exclude'
+    $resourcesToExclude = $resourcesToExcludeAll | ogv -passthru -Title 'Select which specific resources to exclude'
     #$resourcesToExclude = Get-AzResource -ResourceType $resourceTypeToExclude
 ###    - Define naming
 #    $DisplayName = "$($ResourceName) - $($PolicyAssignment.Properties.DisplayName) - $($nistControlId) - $($PolicyName)"
