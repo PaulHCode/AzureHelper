@@ -144,7 +144,7 @@ If($result -eq [Windows.Forms.DialogResult]::OK){
     throw 'A date must be selected'
     return
 }
-If($ExpirationDate -gt [datetime]::now.AddDays(366)){
+If($calendar.SelectionStart -gt [datetime]::now.AddDays(366)){
     write-warning "This exemption will be processed however expiration dates over 1 year in the future are discouraged."
 }
 
