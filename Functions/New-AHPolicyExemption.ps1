@@ -169,8 +169,8 @@ Function New-AHPolicyExemption {
                 $PolicyName = $Policy.Properties.DisplayName
 
                 $DisplayName = "$($resource.Name) - $($PolicyAssignment.Properties.DisplayName) - $($Policy.Properties.DisplayName)"
-                $DisplayName = $DisplayName.Substring(0, 127)
-                $ExemptionName = $DisplayName.Substring(0, 64)
+                $DisplayName = $DisplayName.Substring(0, 127).Trim()
+                $ExemptionName = $DisplayName.Substring(0, 64).Trim()
 
                 @{
                     Name                        = $ExemptionName
