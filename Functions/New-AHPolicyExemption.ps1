@@ -1,6 +1,24 @@
 
-
 Function New-AHPolicyExemption {
+        <#
+    .SYNOPSIS
+        Provides a GUI to add policy exemptions for multiple resources of the same type across all subscriptions in the tenant you are currently in. 
+        Be aware that it may take a few moments between prompts depending on the number of subscriptions, policy definitions, policy assignments, and resources in your environment.
+    .DESCRIPTION
+        If you have 300 storage accounts across 12 subscriptions that all need an exemption for the same reason, then this makes it easy.
+
+        If you have a Management Group with a display name of 'Enterprise Policy' then this assumes that you're dealing with policies on that management group. If you don't have a management group with that name then it will prompt you which management group you want to work with.
+        The command then finds which policies and policy sets are assigned at that management group, looks up the corrosponding policy definitions and prompts the user to select which ones the user wants an exclusion for.
+        The command then checks which resources are in the environment and based on that list prompts the user to select which resource type the objects that need to be excluded are. This step just narrows down the choices for when the user needs to select which resources to exclude.
+        The command then gets all resources of the designated type and allows the user to select which ones should be excluded.
+        The command then prompts if the exemption should be a waiver or mitigated.
+        The command then prompts for an expiration date for the exemption. It does not allow exemptions without expiration dates even though Azure does allow it.
+        The command then prompts for a description for the exemption. This is the same exemption even if you selected 300 resources so phrase your description properly.
+    .Example
+            New-AHPolicyExemption
+    .Notes
+        Author: Paul Harrison
+    #>
     [CmdletBinding()]
     param()
 
@@ -76,7 +94,7 @@ Function New-AHPolicyExemption {
         $label = New-Object System.Windows.Forms.Label
         $label.Location = New-Object System.Drawing.Point(10, 20)
         $label.Size = New-Object System.Drawing.Size(280, 20)
-        $label.Text = 'Please enter the description for exemption:'
+        $label.Text = 'Please enter the description for the exemption:'
         $descriptionForm.Controls.Add($label)
 
         $textBox = New-Object System.Windows.Forms.TextBox
@@ -96,12 +114,17 @@ Function New-AHPolicyExemption {
             $ManagementGroup = Get-AzManagementGroup | Out-GridView -PassThru -Title 'Select which Management Group has the policy applied to it'
         }
         ###    - Get Policy Initiative ID - only display policy defintions for policies that are already assigned
-        $PolicySetDefinitionIds = (Get-AzPolicyAssignment -Scope $ManagementGroup.Id -WarningAction SilentlyContinue).Properties.PolicyDefinitionId #all policy definitions for assigned policies
+        $PolicySetDefinitionIds = [array]((Get-AzPolicyAssignment -Scope $ManagementGroup.Id -WarningAction SilentlyContinue).Properties.PolicyDefinitionId) #all policy definitions for assigned policies
+
+
+        $PolicySets = [array]((Get-AzPolicyAssignment -Scope $ManagementGroup.Id -WarningAction SilentlyContinue)) #all policy definitions for assigned policies
+
         #some items are policy definitions, others are policy set definitions, get a readable version of each
-        #$PolicyChoices = $PolicySetDefinitionIds | Where{$_ -like "*/policyDefinitions/*"}
-        $PolicySetChoices = $PolicySetDefinitionIds | Where-Object { $_ -like '*/policySetDefinitions/*' }
-        #$PolicyChoices = $PolicyChoices | %{Get-AzPolicyDefinition -Id $_ | select @{n='DisplayName';E={$_.Properties.DisplayName}}, @{n='Description';E={$_.Properties.Description}},ResourceId}
-        $PolicySetChoices = $PolicySetChoices | ForEach-Object { Get-AzPolicySetDefinition -Id $_ | Select-Object @{n = 'DisplayName'; E = { $_.Properties.DisplayName } }, @{n = 'Description'; E = { $_.Properties.Description } }, ResourceId }
+        $PolicySetChoices = $PolicySets | Where{ $_.Properties.PolicyDefinitionId -like "*/policySetDefinitions/*" } | Select @{N='DisplayName';E={$_.Properties.DisplayName}}, @{N='Description';E={$_.Properties.Description}}, Name, ResourceId, @{N='PolicyDefinitionId';E={$_.Properties.PolicyDefinitionId}},* -EA 0
+        $PolicySetChoices = ForEach($item in $PolicySetChoices){
+            $item.Properties.PolicyDefinitionId | %{Get-AzPolicySetDefinition -Id $_} | Select-Object @{n = 'DisplayName'; E = { $_.Properties.DisplayName } }, @{n = 'Description'; E = { $_.Properties.Description } }, ResourceId
+        }
+
         $DefinitionChoices = $PolicySetChoices #+ $PolicyChoices
         $PolicySetToAddExemptionTo = $DefinitionChoices | Out-GridView -passthru -Title 'Select which policy to add an exemption to'
         If (($PolicySetToAddExemptionTo.gettype()).BaseType.Name -eq 'Array') {
@@ -110,29 +133,24 @@ Function New-AHPolicyExemption {
         }
         $PolicyAssignment = (Get-AzPolicyAssignment -Scope $ManagementGroup.Id -PolicyDefinitionId $PolicySetToAddExemptionTo.ResourceId -WarningAction SilentlyContinue)
         ###    - Get Policy definition within the initiative
-        If ($PolicySetToAddExemptionTo.ResourceId -like '*/policyDefinitions/*') {
+        If ($PolicySetToAddExemptionTo.ResourceId -like "*/policyDefinitions/*") {
             $PolicyDefinitionToExclude = $PolicySetToAddExemptionTo.ResourceId
             #$policyToAddExemptionTo = (Get-AzPolicyAssignment -Scope $ManagementGroup.Id -PolicyDefinitionId $PolicySetToAddExemptionTo.ResourceId)
-        }
-        Else {
+        }Else{
             #it is a policy set so we need to know which policies within the set to exempt
-            #$policyToAddExemptionTo = (get-azpolicysetass)
-            $PolicyDefinitionToExclude = (Get-AzPolicySetDefinition -ResourceId $PolicySetToAddExemptionTo.ResourceId).Properties.PolicyDefinitions | Out-GridView -passthru -Title 'Select which policy/policies to add exemptions to within the initiative'
+            $definitionLookup = Get-AzPolicyDefinition | %{@{$_.PolicyDefinitionId = $_.Properties.DisplayName}} # we want pretty information so that humans can decide what to do
+            $PolicyDefinitionToExclude = (Get-AzPolicySetDefinition -ResourceId $PolicySetToAddExemptionTo.ResourceId).Properties.PolicyDefinitions  | Select @{n='DefinitionDisplayName';E={$definitionLookup."$($_.PolicyDefinitionId)"}}, * -EA 0 | ogv -passthru -Title 'Select which policy/policies to add exemptions to within the initiative'
         }
         ###    - Get Resource(s) to exclude
         $SubscriptionsInThisTenant = Get-AzSubscription -TenantId (get-azcontext).Tenant.id
         $AllResourceTypesScriptBlock = { (Get-AzResource | Group-Object ResourceType).Name }
         $allResourceTypes = Invoke-AzureCommand -ScriptBlock $AllResourceTypesScriptBlock -Subscription $SubscriptionsInThisTenant | Select-Object -Unique
-        #$resourceTypeToExclude = (Get-AzResource | group ResourceType).Name | ogv -passthru -Title 'Select which resource type to exclude'
+
         $resourceTypeToExclude = $allResourceTypes | Out-GridView -passthru -Title 'Select which resource type to exclude'
         $resourcesToExcludeScriptBlock = { $resourceTypeToExclude | ForEach-Object { get-azresource -ResourceType $_ } }
         $resourcesToExcludeAll = Invoke-AzureCommand -ScriptBlock $resourcesToExcludeScriptBlock -Subscription $SubscriptionsInThisTenant
-        #$resourcesToExclude = $resourceTypeToExclude | %{get-azresource -ResourceType $_} | ogv -passthru -Title 'Select which specific resources to exclude'
+
         $resourcesToExclude = $resourcesToExcludeAll | Out-GridView -passthru -Title 'Select which specific resources to exclude'
-        #$resourcesToExclude = Get-AzResource -ResourceType $resourceTypeToExclude
-        ###    - Define naming
-        #    $DisplayName = "$($ResourceName) - $($PolicyAssignment.Properties.DisplayName) - $($nistControlId) - $($PolicyName)"
-        #    $ExemptionName = $DisplayName.Substring(0,64)
 
         #get category
         $ExemptionCategory = @('Waiver', 'Mitigated') | Out-GridView -passthru -Title 'Select the Exemption Category'
@@ -169,8 +187,9 @@ Function New-AHPolicyExemption {
                 $PolicyName = $Policy.Properties.DisplayName
 
                 $DisplayName = "$($resource.Name) - $($PolicyAssignment.Properties.DisplayName) - $($Policy.Properties.DisplayName)"
-                $DisplayName = $DisplayName.Substring(0, 127).Trim()
-                $ExemptionName = $DisplayName.Substring(0, 64).Trim()
+                #$DisplayName = $DisplayName.Substring(0, 127).Trim()
+                $DisplayName = $DisplayName.Substring(0,$(If($DisplayName.Length -lt 128){$DisplayName.Length}Else{128})).Trim()
+                $ExemptionName = $DisplayName.Substring(0,$(If($DisplayName.Length -lt 64){$DisplayName.Length}Else{64})).Trim()
 
                 @{
                     Name                        = $ExemptionName
