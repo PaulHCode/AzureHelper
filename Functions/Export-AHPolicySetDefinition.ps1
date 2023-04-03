@@ -11,7 +11,7 @@
 .NOTES
    You can use the following one-liner to help you find the policy set definition ID you want
    $MyPolicySets = Get-AzPolicySetDefinition | select @{N='DisplayName';E={$_.Properties.DisplayName}}, @{N='Description';E={$_.Properties.Description}}, resourceId | ogv -PassThru
-   ($MyPolicySet).ResourceId | %{Export-AHPolicySetDefinition -PolicySetDefinitionId $_ -OutputDir 'C:\myPolicies'}
+   ($MyPolicySets).ResourceId | %{Export-AHPolicySetDefinition -PolicySetDefinitionId $_ -OutputDir 'C:\myPolicies'}
 .PARAMETER PolicySetDefinitionId
    The PolicySet definition Id to export
 .PARAMETER OutputDir
@@ -45,6 +45,9 @@ function Export-AHPolicySetDefinition {
     )
     
     begin {
+        If ($PSVersionTable.PSVersion.Major -lt 7) {
+            throw 'This cmdlet requires PowerShell 7 or greater'
+        }
         $numchars = 40 #number of characters to use of the display name before truncating - we don't want 300 character file names
         #define helper function
         function Copy-Property {
