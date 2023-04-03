@@ -1,5 +1,3 @@
-
-
 <#
  - switch for file?
  - switch for folder?

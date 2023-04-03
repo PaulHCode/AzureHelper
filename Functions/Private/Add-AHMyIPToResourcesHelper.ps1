@@ -1,3 +1,11 @@
+<#
+.SYNOPSIS
+    Helper function for Add-AHMyIPToResources
+.DESCRIPTION
+    Helper function for Add-AHMyIPToResources
+.EXAMPLE
+    Add-AHMyIPToResourcesHelper -Type 'Microsoft.KeyVault/vaults' -Id '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyResourceGroup/providers/Microsoft.KeyVault/vaults/MyKeyVault'
+#>
 Function Add-AHMyIPToResourcesHelper {
     [CmdletBinding()]
     param (

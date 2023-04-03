@@ -31,6 +31,9 @@ function Export-AHPolicyDefinition {
         $PolicyDefinitionId
     )
     begin {
+        If ($PSVersionTable.PSVersion.Major -lt 7) {
+            throw 'This cmdlet requires PowerShell 7 or greater'
+        }
     }
     process {
         $original = Get-AzPolicyDefinition -id $PolicyDefinitionId

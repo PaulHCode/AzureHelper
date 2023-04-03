@@ -1,3 +1,11 @@
+<#
+.SYNOPSIS
+    Removes the IP address of the current machine from the network ACLs of a Key Vault.
+.DESCRIPTION
+    Removes the IP address of the current machine from the network ACLs of a Key Vault.
+.EXAMPLE
+    Remove-AHMyIPFromKeyVault -Id '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyResourceGroup/providers/Microsoft.KeyVault/vaults/MyKeyVault' -IPAddress
+#>
 Function Remove-AHMyIPFromKeyVault {
     [CmdletBinding()]
     param (

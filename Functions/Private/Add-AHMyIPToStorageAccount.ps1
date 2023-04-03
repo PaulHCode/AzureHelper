@@ -1,3 +1,11 @@
+<#
+.SYNOPSIS
+    Adds the public IP address of the machine running the script to the IP rules of a storage account.
+.DESCRIPTION
+    Adds the public IP address of the machine running the script to the IP rules of a storage account.
+.EXAMPLE
+    Add-AHMyIPToStorageAccount -Id '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyResourceGroup/providers/Microsoft.Storage/storageAccounts/MyStorageAccount'
+#>
 Function Add-AHMyIPToStorageAccount {
     [CmdletBinding()]
     param (

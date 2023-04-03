@@ -1,4 +1,3 @@
-
 Function Test-AHEnvironment {
     <#
 .SYNOPSIS
@@ -14,6 +13,6 @@ Function Test-AHEnvironment {
 .LINK
 #>
     If ($Null -eq (Get-AzContext)) {
-        throw { "Not connected to Azure - Run Connect-AzAccount before running using this cmdlet" }
+        throw { 'Not connected to Azure - Run Connect-AzAccount before running using this module' }
     }
 }

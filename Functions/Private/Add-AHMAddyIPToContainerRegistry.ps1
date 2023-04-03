@@ -1,3 +1,11 @@
+<#
+.Synopsis
+    Adds the current public IP address to the container registry network rules.
+.DESCRIPTION
+    Adds the current public IP address to the container registry network rules.
+.EXAMPLE
+    Add-AHMyIPToContainerRegistry -Id '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyResourceGroup/providers/Microsoft.ContainerRegistry/registries/MyContainerRegistry'
+#>
 Function Add-AHMyIPToContainerRegistry {
     [CmdletBinding()]
     param (

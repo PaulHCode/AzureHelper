@@ -68,6 +68,10 @@ function Import-AHPolicySetDefinition {
         )
         
         begin {
+                If ($PSVersionTable.PSVersion.Major -lt 7) {
+                        throw 'This cmdlet requires PowerShell 7 or greater'
+                }
+
                 $builtinPolicies = Get-AzPolicyDefinition -Builtin
 
                 #this is a stupid function I plan to fix later so I'll add it to private functions later, but for testing it is fine here
@@ -198,7 +202,7 @@ ResourceId: $($result.ResourceId)
                 If (![string]::IsNullOrEmpty($PolicySetName)) { $PolicySetDefinitionSplat.Add('Name', $PolicySetName) }
                 If (![string]::IsNullOrEmpty($PolicySetDescription)) { $PolicySetDefinitionSplat.Add('Description', $PolicySetDescription) }
                 If (![string]::IsNullOrEmpty($ManagementGroupName)) { $PolicySetDefinitionSplat.Add('ManagementGroupName', $ManagementGroupName) }
-                If (![string]::IsNullOrEmpty($PolicySetCategory)){$PolicySetDefinitionSplat.Add('Metadata',"{`"category`":`"$PolicySetCategory`"}")}
+                If (![string]::IsNullOrEmpty($PolicySetCategory)) { $PolicySetDefinitionSplat.Add('Metadata', "{`"category`":`"$PolicySetCategory`"}") }
                 #                $result = New-AzPolicySetDefinition -PolicyDefinition $PolicySetDefinitionFile -Parameter $PolicySetParameterFile -Name $PolicySetName -Description $PolicySetDescription -ManagementGroupName $ManagementGroupName
                 $result = New-AzPolicySetDefinition @PolicySetDefinitionSplat
                 Write-Verbose @"

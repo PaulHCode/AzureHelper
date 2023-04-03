@@ -1,3 +1,11 @@
+<#
+.SYNOPSIS
+    Adds the current public IP address to the firewall rules of a SQL Server.
+.DESCRIPTION    
+    Adds the current public IP address to the firewall rules of a SQL Server.
+.EXAMPLE
+    Add-AHMyIPToSQLServer -Id '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyResourceGroup/providers/Microsoft.Sql/servers/MySqlServer'
+#>
 Function Add-AHMyIPToSQLServer {
     [CmdletBinding()]
     param (

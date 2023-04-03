@@ -24,13 +24,16 @@ function Export-AHPolicyExemption {
     )
 
     Begin {
+        If ($PSVersionTable.PSVersion.Major -lt 7) {
+            throw 'This cmdlet requires PowerShell 7 or greater'
+        }
     
         If ('System.Management.Automation.ServerRemoteDebugger' -eq [System.Management.Automation.Runspaces.Runspace]::DefaultRunspace.Debugger.GetType().FullName) {
-            throw "This cmdlet can only be used on a local host and cannot be used from a remote session."
+            throw 'This cmdlet can only be used on a local host and cannot be used from a remote session.'
             return
         }
         elseif ((get-item env:/).Name -contains 'AZURE_HTTP_USER_AGENT') {
-            throw "This cmdlet can only be used on a local host and cannot be used from Azure Cloud Shell."
+            throw 'This cmdlet can only be used on a local host and cannot be used from Azure Cloud Shell.'
             return
         }
 

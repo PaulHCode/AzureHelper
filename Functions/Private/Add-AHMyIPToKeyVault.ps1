@@ -1,3 +1,13 @@
+<#
+.SYNOPSIS
+    Adds the current public IP address to the key vault network rules.
+.DESCRIPTION
+    Adds the current public IP address to the key vault network rules.
+.INPUTS
+    System.String
+.EXAMPLE
+    Add-AHMyIPToKeyVault -Id '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyResourceGroup/providers/Microsoft.KeyVault/vaults/MyKeyVault'
+#>
 Function Add-AHMyIPToKeyVault {
     [CmdletBinding()]
     param (

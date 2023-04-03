@@ -1,3 +1,11 @@
+<#
+.SYNOPSIS
+    Helper function for Remove-AHMyIPFromResources
+.DESCRIPTION
+    Helper function for Remove-AHMyIPFromResources
+.EXAMPLE
+    Remove-AHMyIPFromResourcesHelper -Type 'Microsoft.KeyVault/vaults' -Id '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyResourceGroup/providers/Microsoft.KeyVault/vaults/MyKeyVault' -IPAddress <IP Address>
+#>
 Function Remove-AHMyIPFromResourcesHelper {
     [CmdletBinding()]
     param (

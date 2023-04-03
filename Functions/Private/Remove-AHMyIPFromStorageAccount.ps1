@@ -1,3 +1,11 @@
+<#
+.SYNOPSIS
+    Removes the IP address from the Storage Account firewall rules
+.DESCRIPTION
+    Removes the IP address from the Storage Account firewall rules
+.EXAMPLE
+    Remove-AHMyIPFromStorageAccount -Id '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyResourceGroup/providers/Microsoft.Storage/storageAccounts/MyStorageAccount' -IPAddress <IP Address>
+#>
 Function Remove-AHMyIPFromStorageAccount {
     [CmdletBinding()]
     param (
