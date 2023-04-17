@@ -25,14 +25,14 @@ function Export-AHPolicySetDefinition {
         [Parameter(Mandatory = $true)]
         [string]
         [ValidateScript({
-                $result = Get-AzPolicySetDefinition -id $_
+                $result = Get-AzPolicySetDefinition -Id $_
                 If ($result.GetType().Name -eq 'PsPolicySetDefinition' -or $result.GetType().BaseType.Name -eq 'Object') { $true }Else { $false }
             })]
         $PolicySetDefinitionId,
         [Parameter(Mandatory = $false)]
         [string]
         [ValidateScript({
-                test-path $_
+                Test-Path $_
             })]
         $OutputDir = '.', #set to . by default and validate it is valid
         [Parameter(Mandatory = $false)]
@@ -61,7 +61,7 @@ function Export-AHPolicySetDefinition {
             $passthruHash = @{Passthru = $passthru.IsPresent }
             
             $propHash = @{}
-            $property | Foreach-Object {
+            $property | ForEach-Object {
                 If ($ForceLowercaseKeys) {
                     $propHash += @{$_.ToLower() = $SourceObject.$_ }
                 }
@@ -86,25 +86,25 @@ function Export-AHPolicySetDefinition {
             $folderPath = Join-Path $OutputDir $folderName
             If (Test-Path $folderPath) {
                 If ($Force) {
-                    remove-item $folderPath -Force -Confirm:$false -Recurse
+                    Remove-Item $folderPath -Force -Confirm:$false -Recurse
                 }
                 Else {
                     throw 'folder already exists'
                     return 1
                 }
             }
-            new-item -Path $folderPath -ItemType Directory | Out-Null
+            New-Item -Path $folderPath -ItemType Directory | Out-Null
             #EndRegion
 
             #Region Export policy set definition
-            $policySet.Properties.PolicyDefinitions | convertTo-Json -Depth 99 | out-file "$folderPath\$folderName-Policy.json" #export policy
+            $policySet.Properties.PolicyDefinitions | ConvertTo-Json -Depth 99 | Out-File "$folderPath\$folderName-Policy.json" #export policy
             #EndRegion
             #Region Export Policy set parameters
-            $policySet.Properties.Parameters | ConvertTo-Json -Depth 99 | out-file "$folderPath\$folderName-Parameters.json" # export parameters
+            $policySet.Properties.Parameters | ConvertTo-Json -Depth 99 | Out-File "$folderPath\$folderName-Parameters.json" # export parameters
             #EndRegion
 
             #Region Export each policy definition
-            $nonce = 0 #introduce a nonce in case the first $numChars of a policy description are identical
+            #$nonce = 0 #introduce a nonce in case the first $numChars of a policy description are identical
             ForEach ($item in $policySet.Properties.PolicyDefinitions) {
                 
                 #$fileName = If ($item.policyDefinitionReferenceId.Length -le $numchars) { $item.policyDefinitionReferenceId }else { $item.policyDefinitionReferenceId.Substring(0, $numchars - 1) }
@@ -112,10 +112,10 @@ function Export-AHPolicySetDefinition {
                 #$proposedName = $policy.Properties.DisplayName# + $nonce
                 #$fileName = If ($proposedName.Length + $($nonce.tostring().length) -le $numchars) { $proposedName + $nonce.tostring() }else { $proposedName.Substring(0, $numchars - 1 - $($nonce.ToString().Length)) + $nonce.ToString() }
                 $fileName = If ($item.policyDefinitionReferenceId.Length -le $numchars) { $item.policyDefinitionReferenceId }else { $item.policyDefinitionReferenceId.Substring(0, $numchars - 1) }
-                $filename = Remove-InvalidFileNameChars $filename
                 $fileName += $item.policyDefinitionId.split('/')[-1] # just in case the first $numChars of the policyDefinitionReferenceId are the same on a bunch of policies in a policy set
-                Export-AHPolicyDefinition -PolicyDefinitionId $item.policyDefinitionId | Out-File "$folderPath\$filename.json"
-                $nonce += 1
+                $filename = Remove-InvalidFileNameChars $filename
+                Export-AHPolicyDefinition -PolicyDefinitionId $item.policyDefinitionId | Out-File -LiteralPath "$folderPath\$filename.json"
+                #$nonce += 1
             }
             #EndRegion
         }
