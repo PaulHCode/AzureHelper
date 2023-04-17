@@ -16,6 +16,8 @@ Function Remove-InvalidFileNameChars {
         [string]$Name
     )
     $invalidChars = [IO.Path]::GetInvalidFileNameChars() -join ''
+    $invalidChars += '{}' #I know these are allowed but I want to make my life easier
     $re = '[{0}]' -f [regex]::escape($invalidChars)
-    return ($Name -replace $re)
+    $result = $Name -replace $re
+    return ($result.replace('[', '').replace(']', ''))
 }
