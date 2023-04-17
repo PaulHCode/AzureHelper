@@ -37,6 +37,7 @@ function Export-AHPolicyExemption {
             return
         }
 
+<# I moved it to the \Private folder so I could use it in other functions
         Function Remove-InvalidFileNameChars {
             param(
                 [Parameter(Mandatory = $true,
@@ -49,7 +50,7 @@ function Export-AHPolicyExemption {
             $re = '[{0}]' -f [regex]::escape($invalidChars)
             return ($Name -replace $re)
         }
-       
+#>     
     }
     Process {
         $ManagementGroups = Get-AzManagementGroup

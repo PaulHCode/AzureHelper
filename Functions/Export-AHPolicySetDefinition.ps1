@@ -112,6 +112,7 @@ function Export-AHPolicySetDefinition {
                 #$proposedName = $policy.Properties.DisplayName# + $nonce
                 #$fileName = If ($proposedName.Length + $($nonce.tostring().length) -le $numchars) { $proposedName + $nonce.tostring() }else { $proposedName.Substring(0, $numchars - 1 - $($nonce.ToString().Length)) + $nonce.ToString() }
                 $fileName = If ($item.policyDefinitionReferenceId.Length -le $numchars) { $item.policyDefinitionReferenceId }else { $item.policyDefinitionReferenceId.Substring(0, $numchars - 1) }
+                $filename = Remove-InvalidFileNameChars $filename
                 $fileName += $item.policyDefinitionId.split('/')[-1] # just in case the first $numChars of the policyDefinitionReferenceId are the same on a bunch of policies in a policy set
                 Export-AHPolicyDefinition -PolicyDefinitionId $item.policyDefinitionId | Out-File "$folderPath\$filename.json"
                 $nonce += 1
