@@ -38,11 +38,11 @@ function Import-AHPolicySetDefinition {
         param (
                 [Parameter(Mandatory = $true)]
                 [string]
-                [ValidateScript({ test-path $_ })]
+                [ValidateScript({ Test-Path $_ })]
                 $PolicySetDefinitionFile,
                 [Parameter(Mandatory = $true)]
                 [string]
-                [ValidateScript({ test-path $_ })]
+                [ValidateScript({ Test-Path $_ })]
                 $PolicySetParameterFile,
                 [switch]
                 $IncludeMissingPolicyDefinitions,
@@ -84,7 +84,7 @@ function Import-AHPolicySetDefinition {
                         #write-verbose ''
                         $result = $false
                         If ($Null -ne $object) {
-                                $keys = $object | get-member -MemberType NoteProperty
+                                $keys = $object | Get-Member -MemberType NoteProperty
                                 $keys | Where-Object { $Null -ne $_ } | ForEach-Object {
                                         If ($object.$($_.Name) -eq $value) {
                                                 #$totalPath + '.' + $($_.Name)
@@ -104,8 +104,8 @@ function Import-AHPolicySetDefinition {
         process {
                 If ($PurgeExistingPolicyDefinitions) {
                         $PolicyPath = Split-Path -Path $PolicySetDefinitionFile -Parent
-                        ForEach ($file in (Get-ChildItem $policyPath -filter *.json | Where-Object { $_.Name -ne $(split-path $PolicySetDefinitionFile -Leaf) -and $_.Name -ne $(split-path $PolicySetParameterFile -Leaf) } )) {
-                                $policy = Get-Content $file -Raw | convertfrom-json -Depth 99
+                        ForEach ($file in (Get-ChildItem $policyPath -Filter *.json | Where-Object { $_.Name -ne $(Split-Path $PolicySetDefinitionFile -Leaf) -and $_.Name -ne $(Split-Path $PolicySetParameterFile -Leaf) } )) {
+                                $policy = Get-Content $file -Raw | ConvertFrom-Json -Depth 99
                                 ####################################################################################################################################################
                                 If ($Null -ne $policy.Name -and $Null -ne (Get-AzPolicyDefinition -Name $policy.Name -ManagementGroupName $ManagementGroupName -ErrorAction SilentlyContinue)) {
                                         #Check if there are any policy definitions in the same management group with the same name, if so, delete them
@@ -118,15 +118,15 @@ function Import-AHPolicySetDefinition {
                 If ($IncludeMissingPolicyDefinitions) {
                         #this is a dumb way, I know, maybe I'll be smarter later
                         $PolicyPath = Split-Path -Path $PolicySetDefinitionFile -Parent
-                        ForEach ($file in (Get-ChildItem $policyPath -filter *.json | Where-Object { $_.Name -ne $(split-path $PolicySetDefinitionFile -Leaf) -and $_.Name -ne $(split-path $PolicySetParameterFile -Leaf) } )) {
-                                $policy = Get-Content $file -Raw | convertfrom-json -Depth 99
+                        ForEach ($file in (Get-ChildItem $policyPath -Filter *.json | Where-Object { $_.Name -ne $(Split-Path $PolicySetDefinitionFile -Leaf) -and $_.Name -ne $(Split-Path $PolicySetParameterFile -Leaf) } )) {
+                                $policy = Get-Content $file -Raw | ConvertFrom-Json -Depth 99
                                 ####################################################################################################################################################
                                 If ($builtinPolicies.Name -notcontains $($policy.Name)) {
                                         #Check to see if the policy is a builtin one that already exists in the environment if it doesn't exist as a builtin policy then import the policy to the to the management group
                                         $results = Get-AzPolicyDefinition -ManagementGroupName $ManagementGroupName | Where-Object { $_.Name -eq $policy.Name } 
                                         If ($results.count -eq 0) {
                                                 #If the policy is not already in the environment then prepare the policy for importing
-                                        
+                                                
                                                 ### If the policy definition file contains information about "location" data then automatically fix the location based on (get-azlocation).Location
                                                 If (FindByValue -object $policy -value 'location') {
                                                         Write-Warning "The Policy $($policy.Name) contains location data. Please validate location data is correct for this environment."
@@ -136,7 +136,7 @@ function Import-AHPolicySetDefinition {
                                                 If (![string]::IsNullOrEmpty($policy.Properties.DisplayName)) { $PolicyDefinitionSplat.Add('DisplayName', $($policy.Properties.DisplayName)) }
                                                 If (![string]::IsNullOrEmpty($policy.Properties.Description)) { $PolicyDefinitionSplat.Add('Description', $($policy.Properties.Description)) }
                                                 #If (![string]::IsNullOrEmpty($policy.Name)) { $PolicyDefinitionSplat.Add('Name', $policy.Name) } #I didn't use this because the policy definition must always have a name defined
-                                                $result = New-AzPolicyDefinition @PolicyDefinitionSplat -Name $policy.Name -Policy $file -ManagementGroupName $ManagementGroupName #-ErrorAction Break
+                                                $result = New-AzPolicyDefinition @PolicyDefinitionSplat -Name $policy.Name -Policy $file.FullName -ManagementGroupName $ManagementGroupName #-ErrorAction Break
                                                 #$result = New-AzPolicyDefinition @PolicyDefinitionSplat -Policy $file #-ErrorAction Break
                                                 Write-Verbose @"
 
@@ -154,6 +154,11 @@ ResourceId: $($result.ResourceId)
                                                 }
                                                 $policySet | ConvertTo-Json -Depth 99 | Out-File $PolicySetDefinitionFile -Force
 
+                                                
+                                                #then update the Policy Defintion File
+                                                $policyDefinition = Get-Content $file -Raw | ConvertFrom-Json -Depth 99
+                                                $policyDefinition.id = $result.PolicyDefinitionId
+                                                $policyDefinition | ConvertTo-Json -Depth 99 | Out-File -LiteralPath $file.FullName -Force
 
                                         }
                                 }
@@ -173,7 +178,7 @@ ResourceId: $($result.ResourceId)
 
                 ##handle ManagementGroupName problems here - since the Policy Set's policyDefinitionId is overwritten anyway, this section is no longer needed if the policy didn't exist and needed to get imported
 
-                $temp = Get-Content $PolicySetDefinitionFile -Raw | convertfrom-json -Depth 99
+                $temp = Get-Content $PolicySetDefinitionFile -Raw | ConvertFrom-Json -Depth 99
                 $NewPolicy = ForEach ($i in $temp) {
                         If ($i.PolicyDefinitionId -like '*/managementGroups/*') {
                                 #get managementGroup Name then replace it
