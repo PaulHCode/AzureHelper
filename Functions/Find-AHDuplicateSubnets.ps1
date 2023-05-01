@@ -9,6 +9,12 @@
         Find duplicate subnets in all VNets in all subscriptions
 #>
 Function Find-AHDuplicateSubnets {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [switch]
+        $AllSubscriptions
+    )
     $SummarizeSubnetsUsedInAllVNets = {
         $subscriptionName = (Get-AzContext).subscription.Name
         $VNets = (Get-AzVirtualNetwork)
