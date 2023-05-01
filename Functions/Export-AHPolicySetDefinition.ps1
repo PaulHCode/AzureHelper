@@ -6,7 +6,9 @@
 .EXAMPLE
    Export-AHPolicySetDefinition -PolicySetDefinitionId '/providers/Microsoft.Management/managementGroups/TestManagementGroup0/providers/Microsoft.Authorization/policySetDefinitions/General Policies V2' -Force
 .EXAMPLE
-   
+    $MyPolicySets = Get-AzPolicySetDefinition | select @{N='DisplayName';E={$_.Properties.DisplayName}}, @{N='Description';E={$_.Properties.Description}}, resourceId | ogv -PassThru
+   ($MyPolicySets).ResourceId | %{Export-AHPolicySetDefinition -PolicySetDefinitionId $_ -OutputDir 'C:\myPolicies'}   
+
    I'm lazy, so if I want to export a ton of policy sets but I don't want to type out a bunch of stuff I use this
 .NOTES
    You can use the following one-liner to help you find the policy set definition ID you want
