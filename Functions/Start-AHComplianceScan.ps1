@@ -29,12 +29,18 @@ Function Start-AHComplianceScan {
             $RGs = (Get-AzResourceGroup).ResourceGroupName
             $RGs | ForEach-Object -Parallel {
                 $RG = $_
-                $result = Invoke-AzResourceAction -ResourceGroupName $RG -ResourceType 'Microsoft.PolicyInsights/policyStates' -ResourceName 'default' -Action 'triggerEvaluation' -Force
+                $result = Start-AzPolicyComplianceScan -ResourceGroupName $RG -Force
                 [pscustomobject]@{
-                    SubscriptionName = $subscriptionName
+                    SubscriptionName = (Get-AzContext).subscription.Name
                     ResourceGroup    = $RG
                     Result           = $result
                 }
+                #$result = Invoke-AzResourceAction -ResourceGroupName $RG -ResourceType 'Microsoft.PolicyInsights/policyStates' -ResourceName 'default' -Action 'triggerEvaluation' -Force
+                #[pscustomobject]@{
+                ##    SubscriptionName = $subscriptionName
+                #    ResourceGroup    = $RG
+                #    Result           = $result
+                #}
             }
         }
     }
