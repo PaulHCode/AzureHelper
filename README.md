@@ -1,6 +1,6 @@
 # Overview
 
-This module is comprised of useful cmdlets I have written to make my work easier. If you have ideas for additional features please let me know.
+This module is comprised of useful cmdlets I have written to make my work easier. If you have ideas for additional features please let me know. I get behind on updating this README file, but I keep updating the code. One day I'll get around to updating this README, in the mean time feel free to review the help for more information on each cmdlet.
 
 ## Helper Functions
 
