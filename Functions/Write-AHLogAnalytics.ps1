@@ -10,10 +10,13 @@ Function Write-AHLogAnalytics {
     Specifies the SharedKey of the Log Analytics workspace to send the data to.
 .PARAMETER LogType
     Specifies the LogType data to send to Log Analytics.
-.PARAMETER TimeStampField
-    Specifies the optional TimeStampField.
+.PARAMETER TimeStampInput
+    Specifies the optional TimeStampInput.
 .PARAMETER json
     Specifies the json data to send to Log Analytics. The JSON should have 50 or fewer fields.
+.PARAMETER odsEndpoint
+    Specifies the optional custom odsEndpointURI for other environments I'm not aware of. If not specified, the default is used based on the Azure Environments.
+    For example, if you are using Azure Commercial and wanted to specify your odsEndpointUri, you would specify: 'ods.opinsights.azure.com', do not include the https://, or a trailing slash.
 .EXAMPLE
     $json = @"
     [{  "StringValue": "MyString1",
@@ -51,35 +54,39 @@ Function Write-AHLogAnalytics {
                 ([system.text.asciiEncoding]::Unicode.GetByteCount($_) -lt 32MB) -and `
                 ([system.text.asciiEncoding]::Unicode.GetByteCount((($_ | ConvertFrom-Json -Depth 99) | Get-Member -MemberType NoteProperty).Name) -lt 32KB)
             })]
-        [string]$json
+        [string]$json,
+        [Parameter(Mandatory = $false)]
+        [string]$odsEndpoint
     )
 
     begin {
-        switch ((Get-AzContext).Environment.Name) {
-            'AzureCloud' {
-                $odsEndpoint = 'ods.opinsights.azure.com'
-                break
-            }
-            'AzureChinaCloud' {
-                $odsEndpoint = 'ods.opinsights.azure.cn'
-                break
-            }
-            'AzureUSGovernment' {
-                $odsEndpoint = 'ods.opinsights.azure.us'
-                break
-            }
-            'AzureGermanCloud' {
-                $odsEndpoint = 'ods.opinsights.azure.de'
-                break
-            }
-            default {
-                throw 'Unknown Azure Environment'
+        If ([string]::IsNullOrEmpty($odsEndpoint)) {
+            switch ((Get-AzContext).Environment.Name) {
+                'AzureCloud' {
+                    $odsEndpoint = 'ods.opinsights.azure.com'
+                    break
+                }
+                'AzureChinaCloud' {
+                    $odsEndpoint = 'ods.opinsights.azure.cn'
+                    break
+                }
+                'AzureUSGovernment' {
+                    $odsEndpoint = 'ods.opinsights.azure.us'
+                    break
+                }
+                'AzureGermanCloud' {
+                    $odsEndpoint = 'ods.opinsights.azure.de'
+                    break
+                }
+                default {
+                    throw 'Unknown Azure Environment'
+                }
             }
         }
         #$odsEndpoint
             
         # Create the function to create and post the request
-        Function Post-LogAnalyticsData($customerId, $sharedKey, $body, $logType) {
+        Function Post-LogAnalyticsData($customerId, $sharedKey, $body, $logType, $TimeStampField) {
             $method = "POST"
             $contentType = "application/json"
             $resource = "/api/logs"
@@ -101,8 +108,8 @@ Function Write-AHLogAnalytics {
                 "x-ms-date"            = $rfc1123date;
                 "time-generated-field" = $TimeStampField;
             }
-
             $response = Invoke-WebRequest -Uri $uri -Method $method -ContentType $contentType -Headers $headers -Body $body -UseBasicParsing
+            #$response | fl * -Force
             return $response.StatusCode
 
         }
