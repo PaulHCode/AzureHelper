@@ -4,7 +4,7 @@ This module is comprised of useful cmdlets I have written to make my work easier
 
 ## Helper Functions
 
-> These functions are ones that I use just to make my daily work easier
+> These functions are ones that I use just to make my daily work easier. I add new functions but rarely get around to updating the readme... sorry.
 
 - Invoke-AzureCommand - Runs a script block against every subscription using -AllSubscriptions
 
@@ -14,7 +14,16 @@ This module is comprised of useful cmdlets I have written to make my work easier
   $Results = Invoke-AzureCommand -ScriptBlock $MyScriptBlock -AllSubscriptions
 ```
 
-- Select-AHSubscription -GUI to show which subscriptions I have access to then Set-AzContext to it
+## Recent Additions
+- Write-AHLogAnalytics - This function sends data to Log Analytics using the Data Collector REST API
+- Export-AHPolicySetDefinition - Exports an Azure Policy Initiative definition (also known as a policy set) and the associated policy definitions
+- Export-AHPolicyDefinition - Exports an Azure Policy  definition
+- Export-AHPolicyException - Exports Azure Policy Exemptions
+- Find-AHDuplicateSubnets - Find duplicate subnets in all VNets. Have many vnets across many subscriptions? This helps find a mistake.
+- Get-AHAllPolicyExemptions - Gets all policy exemptions for all management groups, subscriptions, resource groups, and individual resources.
+
+
+- Select-AHSubscription - GUI to show which subscriptions I have access to then Set-AzContext to it
 - Move-AHVMFromDedicatedHost - Moves a VM from a dedicated host
 - Move-AHVMToDedicatedHost - Moves a VM to the specified dedicated host
 - New-AHRoute - Add UDR for access to Azure Endpoints - GUI only using Out-GridView passthrough
@@ -24,7 +33,7 @@ This module is comprised of useful cmdlets I have written to make my work easier
 - Get-AHSavingsReport - Retrieves a list of changes that can be made to a subscription to cut costs
 - Get-AHStaleUsers - Gets a list of stale AAD users (mostly copied from Aaron Guilmette with a few tweaks)
 
-## Add/Remove access to resources restricted by IP address
+## Add/Remove access to resources restricted by IP address - I haven't used these in years
 
 > These cmdlets make it easier to add/remove access to resources that are restricted by IP address. Currently only key vaults, storage accounts, and sql servers are supported but more resources can be added if folks find this useful.
 
