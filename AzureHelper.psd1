@@ -12,7 +12,7 @@
     RootModule        = '.\AzureHelper.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.0.48'
+    ModuleVersion     = '1.0.49'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -75,7 +75,8 @@
             'Move-AHVMFromDedicatedHost', 'Move-AHVMToDedicatedHost', 'New-AHRoute', 'Remove-AHMyIPFromResources', 'Remove-AHPolicyToReport', `
             'Remove-AHResourceToAddMyIPTo', 'Remove-AHVM', 'Resize-AHVM', 'Select-AHSubscription', 'Test-AHEnvironment', 'Test-AHHubSpoke', `
             'Move-AHVVMToAvailabilitySet', 'Export-AHPolicySetDefinition', 'Export-AHPolicyDefinition', 'Import-AHPolicySetDefinition', `
-            'New-AHPolicyExemption', 'Find-AHDuplicateSubnets', 'Start-AHComplianceScan', 'Get-AHAllPolicyExemptions', 'Write-AHLogAnalytics')
+            'New-AHPolicyExemption', 'Find-AHDuplicateSubnets', 'Start-AHComplianceScan', 'Get-AHAllPolicyExemptions', 'Write-AHLogAnalytics', `
+            'ConvertTo-FlatNormalizedObject', 'ConvertTo-FlatObject')
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport   = '*'
