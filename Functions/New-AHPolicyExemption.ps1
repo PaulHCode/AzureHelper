@@ -1,6 +1,6 @@
 
 Function New-AHPolicyExemption {
-        <#
+    <#
     .SYNOPSIS
         Provides a GUI to add policy exemptions for multiple resources of the same type across all subscriptions in the tenant you are currently in. 
         Be aware that it may take a few moments between prompts depending on the number of subscriptions, policy definitions, policy assignments, and resources in your environment.
@@ -27,7 +27,7 @@ Function New-AHPolicyExemption {
             throw 'This cmdlet can only be used on a local host and cannot be used from a remote session.'
             return
         }
-        elseif ((get-item env:/).Name -contains 'AZURE_HTTP_USER_AGENT') {
+        elseif ((Get-Item env:/).Name -contains 'AZURE_HTTP_USER_AGENT') {
             throw 'This cmdlet can only be used on a local host and cannot be used from Azure Cloud Shell.'
             return
         }
@@ -120,13 +120,13 @@ Function New-AHPolicyExemption {
         $PolicySets = [array]((Get-AzPolicyAssignment -Scope $ManagementGroup.Id -WarningAction SilentlyContinue)) #all policy definitions for assigned policies
 
         #some items are policy definitions, others are policy set definitions, get a readable version of each
-        $PolicySetChoices = $PolicySets | Where{ $_.Properties.PolicyDefinitionId -like "*/policySetDefinitions/*" } | Select @{N='DisplayName';E={$_.Properties.DisplayName}}, @{N='Description';E={$_.Properties.Description}}, Name, ResourceId, @{N='PolicyDefinitionId';E={$_.Properties.PolicyDefinitionId}},* -EA 0
-        $PolicySetChoices = ForEach($item in $PolicySetChoices){
-            $item.Properties.PolicyDefinitionId | %{Get-AzPolicySetDefinition -Id $_} | Select-Object @{n = 'DisplayName'; E = { $_.Properties.DisplayName } }, @{n = 'Description'; E = { $_.Properties.Description } }, ResourceId
+        $PolicySetChoices = $PolicySets | Where-Object { $_.Properties.PolicyDefinitionId -like "*/policySetDefinitions/*" } | Select-Object @{N = 'DisplayName'; E = { $_.Properties.DisplayName } }, @{N = 'Description'; E = { $_.Properties.Description } }, Name, ResourceId, @{N = 'PolicyDefinitionId'; E = { $_.Properties.PolicyDefinitionId } }, * -EA 0
+        $PolicySetChoices = ForEach ($item in $PolicySetChoices) {
+            $item.Properties.PolicyDefinitionId | ForEach-Object { Get-AzPolicySetDefinition -Id $_ } | Select-Object @{n = 'DisplayName'; E = { $_.Properties.DisplayName } }, @{n = 'Description'; E = { $_.Properties.Description } }, ResourceId
         }
 
         $DefinitionChoices = $PolicySetChoices #+ $PolicyChoices
-        $PolicySetToAddExemptionTo = $DefinitionChoices | Out-GridView -passthru -Title 'Select which policy to add an exemption to'
+        $PolicySetToAddExemptionTo = $DefinitionChoices | Out-GridView -PassThru -Title 'Select which policy to add an exemption to'
         If (($PolicySetToAddExemptionTo.gettype()).BaseType.Name -eq 'Array') {
             throw 'One and only one policy set may be selected'
             return
@@ -136,24 +136,25 @@ Function New-AHPolicyExemption {
         If ($PolicySetToAddExemptionTo.ResourceId -like "*/policyDefinitions/*") {
             $PolicyDefinitionToExclude = $PolicySetToAddExemptionTo.ResourceId
             #$policyToAddExemptionTo = (Get-AzPolicyAssignment -Scope $ManagementGroup.Id -PolicyDefinitionId $PolicySetToAddExemptionTo.ResourceId)
-        }Else{
+        }
+        Else {
             #it is a policy set so we need to know which policies within the set to exempt
-            $definitionLookup = Get-AzPolicyDefinition | %{@{$_.PolicyDefinitionId = $_.Properties.DisplayName}} # we want pretty information so that humans can decide what to do
-            $PolicyDefinitionToExclude = (Get-AzPolicySetDefinition -ResourceId $PolicySetToAddExemptionTo.ResourceId).Properties.PolicyDefinitions  | Select @{n='DefinitionDisplayName';E={$definitionLookup."$($_.PolicyDefinitionId)"}}, * -EA 0 | ogv -passthru -Title 'Select which policy/policies to add exemptions to within the initiative'
+            $definitionLookup = Get-AzPolicyDefinition | ForEach-Object { @{$_.PolicyDefinitionId = $_.Properties.DisplayName } } # we want pretty information so that humans can decide what to do
+            $PolicyDefinitionToExclude = (Get-AzPolicySetDefinition -ResourceId $PolicySetToAddExemptionTo.ResourceId).Properties.PolicyDefinitions | Select-Object @{n = 'DefinitionDisplayName'; E = { $definitionLookup."$($_.PolicyDefinitionId)" } }, * -EA 0 | Out-GridView -PassThru -Title 'Select which policy/policies to add exemptions to within the initiative'
         }
         ###    - Get Resource(s) to exclude
-        $SubscriptionsInThisTenant = Get-AzSubscription -TenantId (get-azcontext).Tenant.id
+        $SubscriptionsInThisTenant = Get-AzSubscription -TenantId (Get-AzContext).Tenant.id
         $AllResourceTypesScriptBlock = { (Get-AzResource | Group-Object ResourceType).Name }
         $allResourceTypes = Invoke-AzureCommand -ScriptBlock $AllResourceTypesScriptBlock -Subscription $SubscriptionsInThisTenant | Select-Object -Unique
 
-        $resourceTypeToExclude = $allResourceTypes | Out-GridView -passthru -Title 'Select which resource type to exclude'
-        $resourcesToExcludeScriptBlock = { $resourceTypeToExclude | ForEach-Object { get-azresource -ResourceType $_ } }
+        $resourceTypeToExclude = $allResourceTypes | Out-GridView -PassThru -Title 'Select which resource type to exclude'
+        $resourcesToExcludeScriptBlock = { $resourceTypeToExclude | ForEach-Object { Get-AzResource -ResourceType $_ } }
         $resourcesToExcludeAll = Invoke-AzureCommand -ScriptBlock $resourcesToExcludeScriptBlock -Subscription $SubscriptionsInThisTenant
 
-        $resourcesToExclude = $resourcesToExcludeAll | Out-GridView -passthru -Title 'Select which specific resources to exclude'
+        $resourcesToExclude = $resourcesToExcludeAll | Out-GridView -PassThru -Title 'Select which specific resources to exclude'
 
         #get category
-        $ExemptionCategory = @('Waiver', 'Mitigated') | Out-GridView -passthru -Title 'Select the Exemption Category'
+        $ExemptionCategory = @('Waiver', 'Mitigated') | Out-GridView -PassThru -Title 'Select the Exemption Category'
 
         #get expiration date
         $result = $dateForm.ShowDialog()
@@ -165,7 +166,7 @@ Function New-AHPolicyExemption {
             return
         }
         If ($calendar.SelectionStart -gt [datetime]::now.AddDays(366)) {
-            write-warning 'This exemption will be processed however expiration dates over 1 year in the future are discouraged.'
+            Write-Warning 'This exemption will be processed however expiration dates over 1 year in the future are discouraged.'
         }
 
         #get description
@@ -188,15 +189,15 @@ Function New-AHPolicyExemption {
 
                 $DisplayName = "$($resource.Name) - $($PolicyAssignment.Properties.DisplayName) - $($Policy.Properties.DisplayName)"
                 #$DisplayName = $DisplayName.Substring(0, 127).Trim()
-                $DisplayName = $DisplayName.Substring(0,$(If($DisplayName.Length -lt 128){$DisplayName.Length}Else{128})).Trim()
-                $ExemptionName = $DisplayName.Substring(0,$(If($DisplayName.Length -lt 64){$DisplayName.Length}Else{64})).Trim()
+                $DisplayName = $DisplayName.Substring(0, $(If ($DisplayName.Length -lt 128) { $DisplayName.Length }Else { 128 })).Trim()
+                $ExemptionName = $DisplayName.Substring(0, $(If ($DisplayName.Length -lt 64) { $DisplayName.Length }Else { 64 })).Trim()
 
                 @{
-                    Name                        = $ExemptionName
+                    Name                        = $ExemptionName.replace('%', '').replace('&', '').replace('/', '').replace('?', '').replace('\', '').replace('<', '').replace('>', '').replace(':', '') #Azure doesn't like these characters
                     PolicyAssignment            = $PolicyAssignment
                     Scope                       = $resource.ResourceId
                     ExemptionCategory           = $ExemptionCategory
-                    DisplayName                 = $DisplayName
+                    DisplayName                 = $DisplayName.replace('%', '').replace('&', '').replace('/', '').replace('?', '').replace('\', '').replace('<', '').replace('>', '').replace(':', '')
                     PolicyDefinitionReferenceId = $definitionToExclude.policyDefinitionReferenceId
                     ExpiresOn                   = $ExpirationDate
                     description                 = $description
