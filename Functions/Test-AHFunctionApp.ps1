@@ -32,6 +32,7 @@ Function Test-AHFunctionApp {
         [int]$waitPeriod = 30
     )
     begin {
+        Set-AzContext -SubscriptionId $SubscriptionId | Out-Null
         $environment = (Get-AzContext).Environment.Name
         $resourceManagerUrl = (Get-AzEnvironment -Name $(Get-AzContext).environment.name).ResourceManagerUrl
         $ADAuthorityURI = (Get-AzEnvironment -Name $(Get-AzContext).environment.name).ActiveDirectoryAuthority
