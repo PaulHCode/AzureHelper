@@ -1,14 +1,14 @@
 <#
     .SYNOPSIS
-        Create a new evidence package from the evidence package definition file.
+        Create a new package from the evidence package definition file.
     .DESCRIPTION
-        Create a new evidence package from the evidence package definition file by copying relevant files from the storage accounts to a local folder.
+        Create a new package from the download package definition file by copying relevant files from the storage accounts to a local folder.
     .PARAMETER EvidencePackageDefinitionFile
-        The path to the evidence package definition file
+        The path to the package definition file
     .EXAMPLE
-        New-EvidencePackage -EvidencePackageDefinitionFile .\EvidencePackageDefinition.json
+        New-AHPackageDownload -DownloadPackageDefinitionFile .\DownloadPackageDefinitionFile.json
     .NOTES
-        An example EvidencePackageDefinitionFile:
+        An example DownloadPackageDefinitionFile:
 
 [
     {
@@ -67,14 +67,17 @@
     }
 ]
 #>
-Function New-AHEvidencePackage {
+Function New-AHPackageDownload {
+    [CmdletBinding()]
+    [Alias('New-AHEvidencePackage')]
     param(
+        [Alias('EvidencePackageDefinitionFile')]
         [Parameter(Mandatory = $true)]
         [string]
         [ValidateScript({
                 Test-Path $_ -PathType Leaf
             })]
-        $EvidencePackageDefinitionFile
+        $DownloadPackageDefinitionFile
     )
     begin {
         $tempLocation = Join-Path $env:TEMP EvidencePackage

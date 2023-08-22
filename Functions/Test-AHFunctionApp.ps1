@@ -79,7 +79,7 @@ Function Test-AHFunctionApp {
                 'Content-Type'    = 'application/json'
             }
             $body = @{
-                input = "test"
+                input = 'test'
             }
             $result = Invoke-RestMethod -Method Post -Uri $uri -Headers $header -Body ($body | ConvertTo-Json)
             Start-Sleep -Seconds $waitPeriod
