@@ -84,7 +84,7 @@ Function New-AHPackageDownload {
         if (!(Test-Path $tempLocation -PathType Container)) { mkdir $tempLocation | Out-Null }
     }
     process {
-        $definition = Get-Content $EvidencePackageDefinitionFile | ConvertFrom-Json
+        $definition = Get-Content $DownloadPackageDefinitionFile | ConvertFrom-Json
         $filesExported = @()
         ForEach ($package in $definition) {
             Set-AzContext -SubscriptionId $package.SubscriptionId | Out-Null
