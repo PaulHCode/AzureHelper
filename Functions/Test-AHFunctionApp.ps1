@@ -7,6 +7,8 @@ Function Test-AHFunctionApp {
             functions that are not HTTP triggered.
         .PARAMETER SubscriptionId
             The subscription ID of the function app
+        .PARAMETER TenantId
+            The tenant ID of the function app
         .PARAMETER ResourceGroupName
             The resource group name of the function app
         .PARAMETER FunctionAppName
@@ -24,6 +26,8 @@ Function Test-AHFunctionApp {
     param(
         [Parameter(Mandatory = $false)]
         [string]$SubscriptionId = (Get-AzContext).Subscription.Id,
+        [Parameter(Mandatory = $false)]
+        [string]$TenantId = (Get-AzContext).Tenant.Id,
         [Parameter(Mandatory = $true)]
         [string]$ResourceGroupName,
         [Parameter(Mandatory = $true)]
@@ -32,7 +36,7 @@ Function Test-AHFunctionApp {
         [int]$waitPeriod = 30
     )
     begin {
-        Set-AzContext -SubscriptionId $SubscriptionId | Out-Null
+        Set-AzContext -SubscriptionId $SubscriptionId -TenantId $TenantId | Out-Null
         $environment = (Get-AzContext).Environment.Name
         $resourceManagerUrl = (Get-AzEnvironment -Name $(Get-AzContext).environment.name).ResourceManagerUrl
         $ADAuthorityURI = (Get-AzEnvironment -Name $(Get-AzContext).environment.name).ActiveDirectoryAuthority
