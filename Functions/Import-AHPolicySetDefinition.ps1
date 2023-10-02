@@ -71,7 +71,7 @@ function Import-AHPolicySetDefinition {
                 If ($PSVersionTable.PSVersion.Major -lt 7) {
                         throw 'This cmdlet requires PowerShell 7 or greater'
                 }
-
+                $metadataFileName = 'metadata.txt'
                 $builtinPolicies = Get-AzPolicyDefinition -Builtin
 
                 #this is a stupid function I plan to fix later so I'll add it to private functions later, but for testing it is fine here
@@ -196,7 +196,22 @@ ResourceId: $($result.ResourceId)
                 $NewPolicy | ConvertTo-Json -Depth 99 | Out-File $PolicySetDefinitionFile -Force
 
 
-
+                #update the DisplayName and Description of the policy set definition to include the version number
+                $metadataFile = $(Join-Path (Split-Path $PolicySetDefinitionFile) $metadataFileName)
+                If (Test-Path $metadataFile) {
+                        $metadataContent = Get-Content $metadataFile | ConvertFrom-Json
+                        $PolicyVersion = $metadataContent.version
+                        if ([string]::IsNullOrEmpty($PolicyVersion)) {
+                                Write-Verbose "No version found in $metadataFile.  DisplayName and Descrption will not be updated for $PolicySetName."
+                                $policySetDescription = $PolicySetDescription
+                                $PolicySetDisplayName = $PolicySetName
+                        }
+                        Else {
+                                #Set-AzPolicySetDefinition -Name $policysetname -ManagementGroupName $ManagementGroupName -Description "$PolicySetDescription-$PolicyVersion" -DisplayName "$PolicySetName-$PolicyVersion"
+                                $PolicySetDescription = "$PolicySetDescription-$PolicyVersion"
+                                $PolicySetDisplayName = "$PolicySetName-$PolicyVersion"
+                        }
+                }
 
                 #autofill policySetDescription depending on metadata? maybe not, maybe force the user to do it since it is a new environemnt... we'll see
                 $PolicySetDefinitionSplat = @{
@@ -205,6 +220,7 @@ ResourceId: $($result.ResourceId)
                 }
                 Write-Verbose "`n`nPolicySetName = $PolicySetName"
                 If (![string]::IsNullOrEmpty($PolicySetName)) { $PolicySetDefinitionSplat.Add('Name', $PolicySetName) }
+                If (![string]::IsNullOrEmpty($PolicySetDisplayName)) { $PolicySetDefinitionSplat.Add('DisplayName', $PolicySetDisplayName) }
                 If (![string]::IsNullOrEmpty($PolicySetDescription)) { $PolicySetDefinitionSplat.Add('Description', $PolicySetDescription) }
                 If (![string]::IsNullOrEmpty($ManagementGroupName)) { $PolicySetDefinitionSplat.Add('ManagementGroupName', $ManagementGroupName) }
                 If (![string]::IsNullOrEmpty($PolicySetCategory)) { $PolicySetDefinitionSplat.Add('Metadata', "{`"category`":`"$PolicySetCategory`"}") }
@@ -215,6 +231,8 @@ ResourceId: $($result.ResourceId)
 Name: $($result.Name)
 ResourceId: $($result.ResourceId)
 "@
+
+
         }
 
         end {
