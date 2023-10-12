@@ -18,6 +18,9 @@ Function Copy-AHPolicyExemptions {
 .PARAMETER Force
     If specified, the function will not throw an error if the exemptionFile contains subscriptions that the user does not have access to.
 
+.PARAMETER LogPath
+    The path to the log file to write verbose output to.
+
 .EXAMPLE 
     Copy policy exemptions from one policy assignment to another.
     PS C:\> Copy-AHPolicyExemptions -assignmentMappingFile '.\AssignmentMapping.json' -exemptionFile '.\PolicyExemptions.json'
