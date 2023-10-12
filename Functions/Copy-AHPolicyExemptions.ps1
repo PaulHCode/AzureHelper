@@ -59,7 +59,11 @@ Function Copy-AHPolicyExemptions {
         [string]
         $exemptionFile,
         [switch]
-        $Force
+        $Force,
+        [Parameter(Mandatory = $false)]
+        [ValidateScript({ Test-Path $(Split-Path $_) -PathType Container })]
+        [string]
+        $LogPath
     )
 
     #    $assignmentMappingFile = '.\AssignmentMapping.json'
@@ -83,15 +87,19 @@ Function Copy-AHPolicyExemptions {
 
 
     ForEach ($assignmentPair in $AssignmentMap) {
+        "`n`nstarting on assignmentPair: $assignmentPair" | ForEach-Object { If ($LogPath) { $_ | Out-File -FilePath $LogPath -Append }; $_ | Write-Verbose }
         $sourceExemptions = $inputExemptions | Where-Object { $_.Properties.PolicyAssignmentId -eq $assignmentPair.Source }
         ForEach ($exemption in $sourceExemptions) {
             $sourceAssignment = Get-AzPolicyAssignment -Id $assignmentPair.Source
+            "sourceAssignment = $($sourceAssignment.PolicyAssignmentId)" | ForEach-Object { If ($LogPath) { $_ | Out-File -FilePath $LogPath -Append }; $_ | Write-Verbose }
             If (!$sourceAssignment) {
                 #make sure the source assignment exists in this environment - we don't want accidental copying of exemptions between environments
-                Write-Warning "No assignment found for $($assignmentPair.Source)"
+                #Write-Warning "No assignment found for $($assignmentPair.Source)" | If($LogPath){Out-File -FilePath $LogPath -Append}
+                "No assignment found for $($assignmentPair.Source)" | ForEach-Object { If ($LogPath) { $_ | Out-File -FilePath $LogPath -Append }; $_ | Write-Warning }
             }
             Else {
                 $targetAssignment = Get-AzPolicyAssignment -Id $assignmentPair.Destination
+                "targetAssignment = $($targetAssignment.PolicyAssignmentId)" | ForEach-Object { If ($LogPath) { $_ | Out-File -FilePath $LogPath -Append }; $_ | Write-Verbose }
                 If ($targetAssignment) {
                     $newExemptionSplat = @{
                         Name              = $exemption.Name + '-migrated'
@@ -104,10 +112,12 @@ Function Copy-AHPolicyExemptions {
                     If ($exemption.Properties.ExpiresOn) { $newExemptionSplat.Add('ExpiresOn', $exemption.Properties.ExpiresOn) }
                     If ($exemption.Properties.Metadata.ToString()) { $newExemptionSplat.Add('Metadata', $exemption.Properties.Metadata) }
                     $newExemptionSplat.Add('Scope', $exemption.ResourceId.split('/providers/Microsoft.Authorization/policyExemption')[0])
-                    New-AzPolicyExemption @newExemptionSplat
+                    "attempted New-AzPolicyExemption splat: $([pscustomobject]$newExemptionSplat)" | ForEach-Object { If ($LogPath) { $_ | Out-File -FilePath $LogPath -Append }; $_ | Write-Verbose }
+                    $result = New-AzPolicyExemption @newExemptionSplat
+                    "Created (or attempted to create existing policy) policy exemption: $($result.ResourceId)" | ForEach-Object { If ($LogPath) { $_ | Out-File -FilePath $LogPath -Append }; $_ | Write-Verbose }
                 }
                 Else {
-                    Write-Warning "No assignment found for $($assignmentPair.Destination)"
+                    "No assignment found for $($assignmentPair.Destination)" | ForEach-Object { If ($LogPath) { $_ | Out-File -FilePath $LogPath -Append }; $_ | Write-Warning }
                 }
             }
         }
