@@ -193,7 +193,7 @@ ResourceId: $($result.ResourceId)
                                 $i
                         }
                 }
-                $NewPolicy | ConvertTo-Json -Depth 99 | Out-File $PolicySetDefinitionFile -Force
+                $NewPolicy | ConvertTo-Json -Depth 99 -AsArray | Out-File $PolicySetDefinitionFile -Force
 
 
                 #update the DisplayName and Description of the policy set definition to include the version number
