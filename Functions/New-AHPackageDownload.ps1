@@ -88,7 +88,11 @@ Function New-AHPackageDownload {
         $filesExported = @()
         ForEach ($package in $definition) {
             Write-Verbose "Processing $($package.SubscriptionId)"
-            Set-AzContext -SubscriptionId $package.SubscriptionId | Out-Null
+            $azContextSplat = @{
+                SubscriptionId = $package.SubscriptionId
+            }
+            If ($package.TenantId) { $azContextSplat.Add('TenantId', $package.TenantId) }
+            Set-AzContext @azContextSplat | Out-Null
             $targets = $package.EvidenceLocations
             ForEach ($target in $targets) {
                 Write-Verbose "Processing $($target.SAName)"

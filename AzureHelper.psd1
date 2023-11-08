@@ -12,7 +12,7 @@
     RootModule        = '.\AzureHelper.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.0.62'
+    ModuleVersion     = '1.0.63'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
