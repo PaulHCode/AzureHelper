@@ -87,9 +87,11 @@ Function New-AHPackageDownload {
         $definition = Get-Content $DownloadPackageDefinitionFile | ConvertFrom-Json
         $filesExported = @()
         ForEach ($package in $definition) {
+            Write-Verbose "Processing $($package.SubscriptionId)"
             Set-AzContext -SubscriptionId $package.SubscriptionId | Out-Null
             $targets = $package.EvidenceLocations
             ForEach ($target in $targets) {
+                Write-Verbose "Processing $($target.SAName)"
                 $targetContext = New-AzStorageContext -StorageAccountName $target.SAName -UseConnectedAccount
                 $blobs = Get-AzStorageBlob -Container $target.Container -Blob * -Context $targetContext 
                 If ($blobs) {
