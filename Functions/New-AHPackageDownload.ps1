@@ -95,7 +95,7 @@ Function New-AHPackageDownload {
             Set-AzContext @azContextSplat | Out-Null
             $targets = $package.EvidenceLocations
             ForEach ($target in $targets) {
-                Write-Verbose "Processing $($target.SAName)"
+                Write-Verbose "Processing $($target.SAName) - $($target.Container)"
                 $targetContext = New-AzStorageContext -StorageAccountName $target.SAName -UseConnectedAccount
                 $blobs = Get-AzStorageBlob -Container $target.Container -Blob * -Context $targetContext 
                 If ($blobs) {
