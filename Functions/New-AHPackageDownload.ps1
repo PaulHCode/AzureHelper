@@ -121,6 +121,6 @@ Function New-AHPackageDownload {
     }
     end {
         Remove-Item $tempLocation -Recurse -Force
-        $filesExported | Select-Object * -ExpandProperty LastModified | Group-Object Date | Select-Object count, @{N = 'Date Collected'; E = { Get-Date $_.Name -Format MM/dd/yyyy } }
+        $filesExported | Select-Object * -ExpandProperty LastModified | Group-Object Date | Select-Object count, @{N = 'Date Collected'; E = { Get-Date $_.Name -Format MM/dd/yyyy } }, group
     }
 }
