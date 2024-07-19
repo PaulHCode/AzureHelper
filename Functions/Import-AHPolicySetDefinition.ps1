@@ -20,6 +20,8 @@
    The PolicySet definition file to import
 .PARAMETER PolicySetParameterFile
    The PolicySet parameter file to import
+.PARAMETER PolicySetGroupFile
+   The PolicySet group file to import
 .PARAMETER PolicySetName
    The name for the policy set
 .PARAMETER PolicySetDescription
@@ -44,6 +46,10 @@ function Import-AHPolicySetDefinition {
                 [string]
                 [ValidateScript({ Test-Path $_ })]
                 $PolicySetParameterFile,
+                [Parameter(Mandatory = $false)]
+                [string]
+                [ValidateScript({ Test-Path $_ })]
+                $PolicySetGroupFile,
                 [switch]
                 $IncludeMissingPolicyDefinitions,
                 [Parameter(Mandatory = $true)]
@@ -104,7 +110,7 @@ function Import-AHPolicySetDefinition {
         process {
                 If ($PurgeExistingPolicyDefinitions) {
                         $PolicyPath = Split-Path -Path $PolicySetDefinitionFile -Parent
-                        ForEach ($file in (Get-ChildItem $policyPath -Filter *.json | Where-Object { $_.Name -ne $(Split-Path $PolicySetDefinitionFile -Leaf) -and $_.Name -ne $(Split-Path $PolicySetParameterFile -Leaf) } )) {
+                        ForEach ($file in (Get-ChildItem $policyPath -Filter *.json | Where-Object { $_.Name -ne $(Split-Path $PolicySetDefinitionFile -Leaf) -and $_.Name -ne $(Split-Path $PolicySetParameterFile -Leaf) -and $_.Name -ne $(Split-Path $PolicySetGroupFile -Leaf) } )) {
                                 $policy = Get-Content $file -Raw | ConvertFrom-Json -Depth 99
                                 ####################################################################################################################################################
                                 If ($Null -ne $policy.Name -and $Null -ne (Get-AzPolicyDefinition -Name $policy.Name -ManagementGroupName $ManagementGroupName -ErrorAction SilentlyContinue)) {
@@ -112,18 +118,20 @@ function Import-AHPolicySetDefinition {
                                         #delete them
                                         Remove-AzPolicyDefinition -Name $policy.Name -ManagementGroupName $ManagementGroupName -Force | Out-Null
                                 }
-
                         }
                 }
                 If ($IncludeMissingPolicyDefinitions) {
                         #this is a dumb way, I know, maybe I'll be smarter later
                         $PolicyPath = Split-Path -Path $PolicySetDefinitionFile -Parent
-                        ForEach ($file in (Get-ChildItem $policyPath -Filter *.json | Where-Object { $_.Name -ne $(Split-Path $PolicySetDefinitionFile -Leaf) -and $_.Name -ne $(Split-Path $PolicySetParameterFile -Leaf) } )) {
+                        ForEach ($file in (Get-ChildItem $policyPath -Filter *.json | Where-Object { $_.Name -ne $(Split-Path $PolicySetDefinitionFile -Leaf) -and $_.Name -ne $(Split-Path $PolicySetParameterFile -Leaf) -and $_.Name -ne $(Split-Path $PolicySetGroupFile -Leaf) } )) {
                                 $policy = Get-Content $file -Raw | ConvertFrom-Json -Depth 99
                                 ####################################################################################################################################################
                                 If ($builtinPolicies.Name -notcontains $($policy.Name)) {
                                         #Check to see if the policy is a builtin one that already exists in the environment if it doesn't exist as a builtin policy then import the policy to the to the management group
                                         $results = Get-AzPolicyDefinition -ManagementGroupName $ManagementGroupName | Where-Object { $_.Name -eq $policy.Name } 
+                                        If ($results.count -gt 1) {
+                                                Write-Warning "There are $($results.count) policies with the name $($policy.Name) in the management group $($ManagementGroupName). This could cause issues with the policy set definition file."
+                                        }
                                         If ($results.count -eq 0) {
                                                 #If the policy is not already in the environment then prepare the policy for importing
                                                 
@@ -137,7 +145,14 @@ function Import-AHPolicySetDefinition {
                                                 If (![string]::IsNullOrEmpty($policy.Properties.Description)) { $PolicyDefinitionSplat.Add('Description', $($policy.Properties.Description)) }
                                                 #If (![string]::IsNullOrEmpty($policy.Name)) { $PolicyDefinitionSplat.Add('Name', $policy.Name) } #I didn't use this because the policy definition must always have a name defined
                                                 $result = New-AzPolicyDefinition @PolicyDefinitionSplat -Name $policy.Name -Policy $file.FullName -ManagementGroupName $ManagementGroupName #-ErrorAction Break
-                                                #$result = New-AzPolicyDefinition @PolicyDefinitionSplat -Policy $file #-ErrorAction Break
+                                                #If this new policy definition didn't create a new policy because it isn't supported in this cloud or some other reason, then handle appropriately
+                                                If ($Null -eq $result) {
+                                                        #remove the file
+                                                        Write-Warning "The file $($file.FullName) is being deleted since it can't be imported."
+                                                        Remove-Item $file
+                                                        #remove the proper part of the initiative Defintion - this will be handled in one chunk by removing all "policyDefinitionId": null,
+                                                }
+
                                                 Write-Verbose @"
 
 Name: $($result.Name)
@@ -149,33 +164,42 @@ ResourceId: $($result.ResourceId)
                                                 $policySet = Get-Content $PolicySetDefinitionFile -Raw | ConvertFrom-Json -Depth 99
                                                 For ($i = 0; $i -lt $policySet.count; $i++) {
                                                         If ($policySet[$i].policyDefinitionId -eq $policy.id) {
+                                                                Write-Verbose "Updating PolicyDefinitionID from $($policySet[$i].policyDefinitionId) to $($result.PolicyDefinitionId)"
                                                                 $policySet[$i].policyDefinitionId = $result.PolicyDefinitionId
                                                         }
                                                 }
                                                 $policySet | ConvertTo-Json -Depth 99 | Out-File $PolicySetDefinitionFile -Force
-
+                                                Write-Verbose "The policy definition $($policy.Name) was imported and the PolicySetDefinitionFile was updated to point to the new PolicyDefinitionId $($result.PolicyDefinitionId)"
                                                 
                                                 #then update the Policy Defintion File
                                                 $policyDefinition = Get-Content $file -Raw | ConvertFrom-Json -Depth 99
                                                 $policyDefinition.id = $result.PolicyDefinitionId
                                                 $policyDefinition | ConvertTo-Json -Depth 99 | Out-File -LiteralPath $file.FullName -Force
-
+                                                Write-Verbose "The Policy Definition File $($file.FullName) was updated to point to the new PolicyDefinitionId $($result.PolicyDefinitionId)"
                                         }
+                                        Else {
+                                                #an existing custom policy definition being used by this initiative
+                                                Write-Verbose "The policy $($policy.Name) was updated in the policy set definition file to point to the existing policy definition $($results.PolicyDefinitionId)"
+                                                $policySet = Get-Content $PolicySetDefinitionFile -Raw | ConvertFrom-Json -Depth 99
+                                                For ($i = 0; $i -lt $policySet.count; $i++) {
+                                                        If ($policySet[$i].policyDefinitionId -eq $policy.id) {
+                                                                $policySet[$i].policyDefinitionId = $results.PolicyDefinitionId
+                                                        }
+                                                }
+                                                $policySet | ConvertTo-Json -Depth 99 | Out-File $PolicySetDefinitionFile -Force
+                                        }
+                                        
                                 }
-                                #####################################################################################################################################################
-                                
-
+                                Else {
+                                }
                         }
                 }
 
 
-                ### fix location data in the policy set parameters file - I'm not going to fix location data because it must be considered manually but I should alert
-                ### fix location data in the policy set definition - I'm not going to fix location data because it must be considered manually but I should alert
 
-
-
-
-
+                #Remove all    "policyDefinitionId": null, from the initiative definition
+                $policySet = Get-Content $PolicySetDefinitionFile -Raw | ConvertFrom-Json -Depth 99
+                $policySet | Where-Object { $Null -ne $_.policydefinitionId } | ConvertTo-Json -Depth 99 -AsArray | Out-File $PolicySetDefinitionFile -Force
                 ##handle ManagementGroupName problems here - since the Policy Set's policyDefinitionId is overwritten anyway, this section is no longer needed if the policy didn't exist and needed to get imported
 
                 $temp = Get-Content $PolicySetDefinitionFile -Raw | ConvertFrom-Json -Depth 99
@@ -195,7 +219,6 @@ ResourceId: $($result.ResourceId)
                 }
                 $NewPolicy | ConvertTo-Json -Depth 99 -AsArray | Out-File $PolicySetDefinitionFile -Force
 
-
                 #update the DisplayName and Description of the policy set definition to include the version number
                 $metadataFile = $(Join-Path (Split-Path $PolicySetDefinitionFile) $metadataFileName)
                 If (Test-Path $metadataFile) {
@@ -212,11 +235,13 @@ ResourceId: $($result.ResourceId)
                                 $PolicySetDisplayName = "$PolicySetName-$PolicyVersion"
                         }
                 }
-
                 #autofill policySetDescription depending on metadata? maybe not, maybe force the user to do it since it is a new environemnt... we'll see
                 $PolicySetDefinitionSplat = @{
                         PolicyDefinition = $PolicySetDefinitionFile
-                        Parameter        = $PolicySetParameterFile
+                        Parameter        = $( $(Get-Content $PolicySetParameterFile -Raw))
+                }
+                If ($PolicySetGroupFile) {
+                        $PolicySetDefinitionSplat.Add('GroupDefinition', $( Get-Content $PolicySetGroupFile -Raw))
                 }
                 Write-Verbose "`n`nPolicySetName = $PolicySetName"
                 If (![string]::IsNullOrEmpty($PolicySetName)) { $PolicySetDefinitionSplat.Add('Name', $PolicySetName) }
@@ -225,6 +250,7 @@ ResourceId: $($result.ResourceId)
                 If (![string]::IsNullOrEmpty($ManagementGroupName)) { $PolicySetDefinitionSplat.Add('ManagementGroupName', $ManagementGroupName) }
                 If (![string]::IsNullOrEmpty($PolicySetCategory)) { $PolicySetDefinitionSplat.Add('Metadata', "{`"category`":`"$PolicySetCategory`"}") }
                 #                $result = New-AzPolicySetDefinition -PolicyDefinition $PolicySetDefinitionFile -Parameter $PolicySetParameterFile -Name $PolicySetName -Description $PolicySetDescription -ManagementGroupName $ManagementGroupName
+                Write-Verbose "PolicySetDefinitionSplat = $($PolicySetDefinitionSplat | ConvertTo-Json -Depth 99)"
                 $result = New-AzPolicySetDefinition @PolicySetDefinitionSplat
                 Write-Verbose @"
 

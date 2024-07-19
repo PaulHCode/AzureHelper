@@ -28,7 +28,7 @@ function Export-AHPolicySetDefinition {
         [string]
         [ValidateScript({
                 $result = Get-AzPolicySetDefinition -Id $_
-                If ($result.GetType().Name -eq 'PsPolicySetDefinition' -or $result.GetType().BaseType.Name -eq 'Object') { $true }Else { $false }
+                If ($result.GetType().Name -eq 'PsPolicySetDefinition' -or $result.GetType().BaseType.Name -eq 'Object' <#-or $result.GetType().BaseType.Name -eq 'Array'#>) { $true }Else { $false }
             })]
         $PolicySetDefinitionId,
         [Parameter(Mandatory = $false)]
@@ -104,6 +104,8 @@ function Export-AHPolicySetDefinition {
             #Region Export Policy set parameters
             $policySet.Properties.Parameters | ConvertTo-Json -Depth 99 | Out-File "$folderPath\$folderName-Parameters.json" # export parameters
             #EndRegion
+            #Export Policy set Groups
+            $policySet.Properties.policyDefinitionGroups | ConvertTo-Json -Depth 99 | Out-File "$folderPath\$folderName-Groups.json" # export groups
 
             #Region Export each policy definition
             #$nonce = 0 #introduce a nonce in case the first $numChars of a policy description are identical
@@ -120,6 +122,11 @@ function Export-AHPolicySetDefinition {
                 #$nonce += 1
             }
             #EndRegion
+            #This metadata file isn't needed, but I like to have it to be used during import to know which version I have.
+            $metadata = @{
+                'version' = $((Get-Date -Format 'yyyy-MM-dd'))
+            }
+            $metadata | ConvertTo-Json -Depth 99 | Out-File "$folderPath\metadata.txt"
         }
     }
     
