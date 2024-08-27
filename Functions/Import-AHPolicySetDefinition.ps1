@@ -1,4 +1,3 @@
-
 <#
 .Synopsis
    Imports an Azure Policy Initiative definition (also known as a policy set) and the associated policy definitions
@@ -153,6 +152,8 @@ function Import-AHPolicySetDefinition {
                                                         #remove the proper part of the initiative Defintion - this will be handled in one chunk by removing all "policyDefinitionId": null,
                                                 }
 
+
+                                                #$result = New-AzPolicyDefinition @PolicyDefinitionSplat -Policy $file #-ErrorAction Break
                                                 Write-Verbose @"
 
 Name: $($result.Name)
@@ -164,6 +165,10 @@ ResourceId: $($result.ResourceId)
                                                 $policySet = Get-Content $PolicySetDefinitionFile -Raw | ConvertFrom-Json -Depth 99
                                                 For ($i = 0; $i -lt $policySet.count; $i++) {
                                                         If ($policySet[$i].policyDefinitionId -eq $policy.id) {
+                                                                #If($policySet[$i].policyDefinitionReferenceId -eq $policy.Properties.policyDefinitionReferenceId){
+                                                                #write-verbose "Updating PolicyDefinitionID from $($policySet[$i].policyDefinitionId) to $($result.PolicyDefinitionId)"
+                                                                #                                                                        $policySet[$i].policyDefinitionId = $result.PolicyDefinitionId
+                                                                #}
                                                                 Write-Verbose "Updating PolicyDefinitionID from $($policySet[$i].policyDefinitionId) to $($result.PolicyDefinitionId)"
                                                                 $policySet[$i].policyDefinitionId = $result.PolicyDefinitionId
                                                         }
@@ -179,10 +184,11 @@ ResourceId: $($result.ResourceId)
                                         }
                                         Else {
                                                 #an existing custom policy definition being used by this initiative
-                                                Write-Verbose "The policy $($policy.Name) was updated in the policy set definition file to point to the existing policy definition $($results.PolicyDefinitionId)"
+                                                Write-Verbose "NewCode2-The policy $($policy.Name) was updated in the policy set definition file to point to the existing policy definition $($results.PolicyDefinitionId)"
                                                 $policySet = Get-Content $PolicySetDefinitionFile -Raw | ConvertFrom-Json -Depth 99
                                                 For ($i = 0; $i -lt $policySet.count; $i++) {
                                                         If ($policySet[$i].policyDefinitionId -eq $policy.id) {
+                                                                Write-Verbose "NewCode2-Updating PolicyDefinitionID from $($policySet[$i].policyDefinitionId) to $($results.PolicyDefinitionId)"
                                                                 $policySet[$i].policyDefinitionId = $results.PolicyDefinitionId
                                                         }
                                                 }
@@ -191,6 +197,30 @@ ResourceId: $($result.ResourceId)
                                         
                                 }
                                 Else {
+                                        Write-Verbose "The policy $($policy.Name) already exists in the environment - validating..."
+                                        #If the policy is already in the environment then validate that the policy definition is the same as the one in the environment and update the policy set definition to point to the existing policy definition
+                                        #limit results to just the same version
+                                        $results = Get-AzPolicyDefinition -ManagementGroupName $ManagementGroupName | Where-Object { $_.Name -eq $policy.Name -and $_.Properties.Metadata.version -eq $policy.Properties.Metadata.version }
+                                        #There could be a pre-existing builtin policy, or a pre-existing custom Policy
+                                        If ($results.count -gt 1) {
+                                                Write-Warning "There are $($results.count) policies with the name $($policy.Name) and version $($policy.Properties.Metadata.version) in the management group $($ManagementGroupName). This could cause issues with the policy set definition file."
+                                        }
+                                        If ($results.count -eq 1) {
+                                                $policySet = Get-Content $PolicySetDefinitionFile -Raw | ConvertFrom-Json -Depth 99
+                                                If (($policySet | Where-Object { $_.policyDefinitionId -like "*$($policy.Id.split('/')[-1])" }).policydefinitionId -notcontains $policy.id) {
+                                                        Write-Warning "The policy $($policy.Name) is not the same as the policy in the environment. This could cause issues with the policy set definition file, so I'm fixing it here by updating the id from $(($policySet | Where-Object{$_.policyDefinitionId -like "*$($policy.Id.split('/')[-1])"}).policydefinitionId) to $($results.PolicyDefinitionId)."
+                                                        $policySet = ForEach ($item in $policySet) {
+                                                                If ($item.policyDefinitionId.split('/')[-1] -eq $results.PolicyDefinitionId.split('/')[-1]) {
+                                                                        $item.policyDefinitionId = $results.PolicyDefinitionId
+                                                                }
+                                                                $item
+                                                        }
+                                                        $policySet | ConvertTo-Json -Depth 99 | Out-File $PolicySetDefinitionFile -Force
+                                                }
+                                                Else {
+                                                        #Write-Verbose "The policy $($policy.Name) is the same as the policy in the environment."
+                                                }
+                                        }
                                 }
                         }
                 }
