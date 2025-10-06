@@ -25,40 +25,40 @@ function Export-AHPolicyDefinition {
         [Parameter(Mandatory = $true)]
         [string]
         [ValidateScript({
-                $result = Get-AzPolicyDefinition -id $_
-                If ($result.GetType().Name -eq 'PsPolicyDefinition' -or $result.GetType().BaseType.Name -eq 'Object') { $true }Else { $false }
+                $result = Get-AzurePolicyDefinitionREST -PolicyDefinitionId $_
+                if ($result.GetType().Name -eq 'PsPolicyDefinition' -or $result.GetType().BaseType.Name -eq 'Object') { $true }else { $false }
             })]
         $PolicyDefinitionId
     )
     begin {
-        If ($PSVersionTable.PSVersion.Major -lt 7) {
+        if ($PSVersionTable.PSVersion.Major -lt 7) {
             throw 'This cmdlet requires PowerShell 7 or greater'
         }
     }
     process {
-        $original = Get-AzPolicyDefinition -id $PolicyDefinitionId
-
-        $fixed = [pscustomobject]@{}
-        $exclusions = @('ResourceId', 'ResourceName', 'ResourceType', 'SubscriptionId', 'Properties', 'PolicyDefinitionId')
-        $properties = ($original | Get-Member -MemberType Properties).Name | Where-Object { $_ -notin $exclusions }
-        Copy-Property -SourceObject $original -InputObject $fixed -Property $properties -ForceLowercaseKeys
+        $original = Get-AzurePolicyDefinitionREST -PolicyDefinitionId $PolicyDefinitionId
+        $original | ConvertTo-Json -Depth 99
+        #$fixed = [pscustomobject]@{}
+        #$exclusions = @('ResourceId', 'ResourceName', 'ResourceType', 'SubscriptionId', 'Properties', 'PolicyDefinitionId')
+        #$properties = ($original | Get-Member -MemberType Properties).Name | Where-Object { $_ -notin $exclusions }
+        #Copy-Property -SourceObject $original -InputObject $fixed -Property $properties -ForceLowercaseKeys
 
         #add in type
-        $fixed | Add-Member -NotePropertyName 'type' -NotePropertyValue 'Microsoft.Authorization/policyDefinitions'
+        #$fixed | Add-Member -NotePropertyName 'type' -NotePropertyValue 'Microsoft.Authorization/policyDefinitions'
 
         #still need to change PolicyRule to policyRule
         #copy all elements of _.Properties except PolicyRule
-        $tempProperties = [pscustomobject]@{}
-        $properties = ($original.Properties | Get-Member -MemberType Properties).Name | Where-Object { $_ -ne 'PolicyRule' }
-        Copy-Property -SourceObject $($original.Properties) -InputObject $tempProperties -Property $properties -ForceLowercaseKeys #-Verbose
+        #$tempProperties = [pscustomobject]@{}
+        #$properties = ($original.Properties | Get-Member -MemberType Properties).Name | Where-Object { $_ -ne 'PolicyRule' }
+        #Copy-Property -SourceObject $($original.Properties) -InputObject $tempProperties -Property $properties -ForceLowercaseKeys #-Verbose
         #add back in policyRule with the corrected capitalization
-        $tempProperties | Add-Member -NotePropertyName 'policyRule' -NotePropertyValue $original.Properties.PolicyRule
+        #$tempProperties | Add-Member -NotePropertyName 'policyRule' -NotePropertyValue $original.Properties.PolicyRule
         #add Properties back onto the main object
-        $fixed | Add-Member -NotePropertyName 'properties' -NotePropertyValue $tempProperties
+        #$fixed | Add-Member -NotePropertyName 'properties' -NotePropertyValue $tempProperties
         #add back in id instead of PolicyDefinitionId
-        $fixed | Add-Member -NotePropertyName 'id' -NotePropertyValue $original.PolicyDefinitionId
+        #$fixed | Add-Member -NotePropertyName 'id' -NotePropertyValue $original.PolicyDefinitionId
 
-        $fixed | ConvertTo-Json -Depth 99
+        #$fixed | ConvertTo-Json -Depth 99
     }
     end {
         
@@ -67,3 +67,4 @@ function Export-AHPolicyDefinition {
 }
 
 
+ 
